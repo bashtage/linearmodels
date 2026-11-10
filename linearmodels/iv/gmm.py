@@ -640,7 +640,7 @@ class IVGMMCovariance(HomoskedasticCovariance):
         debiased: bool = False,
         **cov_config: str | bool,
     ) -> None:
-        super().__init__(x, y, z, params, debiased)
+        super().__init__(x, y, z, params, debiased, method="pinv")
         cov_type = lower_option(cov_type)
         self._cov_type = cov_type
         self._cov_config = cov_config

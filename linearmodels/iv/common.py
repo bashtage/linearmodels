@@ -4,7 +4,7 @@ Rank tests of the first stage and the model F-statistic.
 
 from __future__ import annotations
 
-from typing import Any, NamedTuple
+from typing import Any, Literal, NamedTuple
 import warnings
 
 from numpy import (
@@ -21,10 +21,10 @@ from numpy import (
     unique,
     where,
 )
-from numpy.linalg import LinAlgError, eigh, inv, matrix_rank, svd
+from numpy.linalg import LinAlgError, eigh, inv, matrix_rank, norm, svd
 from scipy.linalg import cholesky, solve_triangular
 
-from linearmodels.iv._utility import annihilate
+from linearmodels.iv._utility import annihilate, resolve_method
 from linearmodels.iv.gmm import (
     HeteroskedasticWeightMatrix,
     KernelWeightMatrix,
@@ -103,11 +103,29 @@ class _FirstStageRank(NamedTuple):
     irqxx: linearmodels.typing.data.Float64Array
 
 
+def _rank(
+    a: linearmodels.typing.data.Float64Array, *, method: Literal["pinv", "qr"]
+) -> int:
+    """
+    The rank of a, of its columns scaled to unit length if method is "qr".
+
+    Both use the tolerance of matrix_rank, as pinv does. The models use 1e-9 with
+    "qr", for the accuracy of the estimates, which these tests do not compute.
+    """
+    if method == "qr":
+        scale = norm(a, axis=0)
+        scale[scale == 0] = 1.0
+        a = a / scale
+    return int(matrix_rank(a))
+
+
 def _first_stage_rank(
     endog: linearmodels.typing.data.Float64Array,
     instr: linearmodels.typing.data.Float64Array,
     exog: linearmodels.typing.data.Float64Array,
     name: str,
+    *,
+    method: Literal["pinv", "qr"] = "pinv",
 ) -> _FirstStageRank | InvalidTestStatistic:
     r"""
     Decompose the first stage into canonical correlations.
@@ -146,16 +164,16 @@ def _first_stage_rank(
     x = asarray(endog, dtype=float)
     z = asarray(instr, dtype=float)
     if nexog > 0:
-        x = annihilate(x, exog)
-        z = annihilate(z, exog)
-    if matrix_rank(x) < nendog:
+        x = annihilate(x, exog, method=method)
+        z = annihilate(z, exog, method=method)
+    if _rank(x, method=method) < nendog:
         return InvalidTestStatistic(
             "The endogenous regressors are collinear once the exogenous "
             f"regressors are partialled out; the {name} statistic is not "
             "defined.",
             name=name,
         )
-    if matrix_rank(z) < ninstr:
+    if _rank(z, method=method) < ninstr:
         return InvalidTestStatistic(
             "The instruments are collinear once the exogenous regressors are "
             f"partialled out; the {name} statistic is not defined.",
@@ -185,6 +203,8 @@ def cragg_donald(
     endog: linearmodels.typing.data.Float64Array,
     instr: linearmodels.typing.data.Float64Array,
     exog: linearmodels.typing.data.Float64Array,
+    *,
+    method: Literal["pinv", "qr"] | None = None,
 ) -> WaldTestStatistic | InvalidTestStatistic:
     r"""
     Cragg-Donald test of reduced rank for the first-stage regression.
@@ -198,6 +218,14 @@ def cragg_donald(
     exog : ndarray
         Weighted exogenous regressor array (nobs, nexog), partialled out
         before testing. Include a constant column here if the model has one.
+
+    method : {"pinv", "qr"}, optional
+        Numerical method of partialling out exog and of the rank tests. "qr" scales
+        the columns to unit length, so the statistic does not depend on the units of
+        the variables. If not given, "pinv" is used and a ``FutureWarning`` is
+        issued, since the default will be "qr" in linearmodels 8.0.
+
+        .. versionadded:: 7.2
 
     Returns
     -------
@@ -294,8 +322,9 @@ def cragg_donald(
     regression. In *Identification and Inference for Econometric Models*.
     Cambridge University Press.
     """
+    method = resolve_method(method, "cragg_donald")
     name = "Cragg-Donald Test"
-    dec = _first_stage_rank(endog, instr, exog, name)
+    dec = _first_stage_rank(endog, instr, exog, name, method=method)
     if isinstance(dec, InvalidTestStatistic):
         return dec
     r2 = float(dec.s[-1]) ** 2
@@ -308,6 +337,8 @@ def cragg_donald_f(
     endog: linearmodels.typing.data.Float64Array,
     instr: linearmodels.typing.data.Float64Array,
     exog: linearmodels.typing.data.Float64Array,
+    *,
+    method: Literal["pinv", "qr"] | None = None,
 ) -> float:
     r"""
     Cragg-Donald Wald F statistic.
@@ -321,6 +352,14 @@ def cragg_donald_f(
     exog : ndarray
         Weighted exogenous regressor array (nobs, nexog), partialled out
         before testing. Include a constant column here if the model has one.
+
+    method : {"pinv", "qr"}, optional
+        Numerical method of partialling out exog and of the rank tests. "qr" scales
+        the columns to unit length, so the statistic does not depend on the units of
+        the variables. If not given, "pinv" is used and a ``FutureWarning`` is
+        issued, since the default will be "qr" in linearmodels 8.0.
+
+        .. versionadded:: 7.2
 
     Returns
     -------
@@ -360,7 +399,8 @@ def cragg_donald_f(
     regression. In *Identification and Inference for Econometric Models*.
     Cambridge University Press.
     """
-    test = cragg_donald(endog, instr, exog)
+    method = resolve_method(method, "cragg_donald_f")
+    test = cragg_donald(endog, instr, exog, method=method)
     if isinstance(test, InvalidTestStatistic):
         return nan
     return float(test.stat) / instr.shape[1]
@@ -458,6 +498,7 @@ def _kleibergen_paap(
     cov_config: dict[str, Any] | None,
     *,
     wald: bool = True,
+    method: Literal["pinv", "qr"] = "pinv",
 ) -> tuple[WaldTestStatistic | InvalidTestStatistic, float]:
     """
     Compute the rk LM test and the rk Wald F-statistic
@@ -483,7 +524,7 @@ def _kleibergen_paap(
             reason = "The statistic requires at least two clusters."
             return InvalidTestStatistic(reason, name=name), nan
         config["clusters"] = clusters
-    dec = _first_stage_rank(endog, instr, exog, name)
+    dec = _first_stage_rank(endog, instr, exog, name, method=method)
     if isinstance(dec, InvalidTestStatistic):
         return dec, nan
     df = dec.ninstr - dec.nendog + 1
@@ -527,6 +568,8 @@ def kleibergen_paap(
     exog: linearmodels.typing.data.Float64Array,
     cov_type: str = "robust",
     cov_config: dict[str, Any] | None = None,
+    *,
+    method: Literal["pinv", "qr"] | None = None,
 ) -> WaldTestStatistic | InvalidTestStatistic:
     r"""
     Kleibergen-Paap rk LM test of underidentification.
@@ -564,6 +607,14 @@ def kleibergen_paap(
         with the quadratic spectral kernel. See
         :func:`~linearmodels.iv.covariance.kernel_optimal_bandwidth`, which
         lists the supported kernels.
+
+    method : {"pinv", "qr"}, optional
+        Numerical method of partialling out exog and of the rank tests. "qr" scales
+        the columns to unit length, so the statistic does not depend on the units of
+        the variables. If not given, "pinv" is used and a ``FutureWarning`` is
+        issued, since the default will be "qr" in linearmodels 8.0.
+
+        .. versionadded:: 7.2
 
     Returns
     -------
@@ -687,7 +738,10 @@ def kleibergen_paap(
     the rank of a matrix using the Kleibergen-Paap rk statistic. *Statistical
     Software Components* S456865, Boston College.
     """
-    return _kleibergen_paap(endog, instr, exog, cov_type, cov_config, wald=False)[0]
+    method = resolve_method(method, "kleibergen_paap")
+    return _kleibergen_paap(
+        endog, instr, exog, cov_type, cov_config, wald=False, method=method
+    )[0]
 
 
 def kleibergen_paap_f(
@@ -696,6 +750,8 @@ def kleibergen_paap_f(
     exog: linearmodels.typing.data.Float64Array,
     cov_type: str = "robust",
     cov_config: dict[str, Any] | None = None,
+    *,
+    method: Literal["pinv", "qr"] | None = None,
 ) -> float:
     r"""
     Kleibergen-Paap rk Wald F statistic.
@@ -725,6 +781,14 @@ def kleibergen_paap_f(
 
     cov_config : dict, optional
         Options for the covariance estimator. See :func:`kleibergen_paap`.
+
+    method : {"pinv", "qr"}, optional
+        Numerical method of partialling out exog and of the rank tests. "qr" scales
+        the columns to unit length, so the statistic does not depend on the units of
+        the variables. If not given, "pinv" is used and a ``FutureWarning`` is
+        issued, since the default will be "qr" in linearmodels 8.0.
+
+        .. versionadded:: 7.2
 
     Returns
     -------
@@ -804,7 +868,8 @@ def kleibergen_paap_f(
     instrumental variables/GMM estimation and testing. *Stata Journal*, 7(4),
     465-506.
     """
-    return _kleibergen_paap(endog, instr, exog, cov_type, cov_config)[1]
+    method = resolve_method(method, "kleibergen_paap_f")
+    return _kleibergen_paap(endog, instr, exog, cov_type, cov_config, method=method)[1]
 
 
 def f_statistic(

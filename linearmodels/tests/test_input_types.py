@@ -347,6 +347,7 @@ def test_complex_input_raises_and_names_the_input(data, name, kind):
     with warnings.catch_warnings():
         # The imaginary part must not be discarded with a warning
         warnings.simplefilter("error")
+        warnings.filterwarnings("ignore", "The default method", FutureWarning)
         with pytest.raises(TypeError, match=rf"{name} has a complex dtype"):
             build_iv(IV2SLS, data, **{name: value})
 

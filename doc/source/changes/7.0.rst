@@ -9,6 +9,24 @@ be added to 7.1. 7.2 also contains the fixes below.
 
 .. TODO(R2): Add #863 if it is merged for 7.2.
 
+.. rubric:: New features
+
+- ``IV2SLS`` and ``IVLIML``, and their ``from_formula``, have a ``method`` keyword.
+  ``method="qr"`` computes the estimates, their covariance and the kappa of LIML from QR
+  decompositions, as R's ``ivreg`` does, and tests the rank of ``[exog, endog]`` and
+  ``[exog, instruments]`` after scaling their columns to unit length. It does not depend
+  on the units of the variables, and it is more accurate: with c the condition number of
+  the scaled data, about 16 - log10(c) digits are correct, against 16 - 2 log10(c) with
+  ``method="pinv"``. With nearly collinear regressors (c of about 1e6), the median error
+  of the 2SLS estimates and their robust standard errors falls from about 5e-4 to 4e-11
+  in simulations. ``method="pinv"``, the default, gives the same results as 7.1. The IV
+  covariance estimators, ``estimate_parameters``, ``cragg_donald``, ``cragg_donald_f``,
+  ``kleibergen_paap``, ``kleibergen_paap_f`` and ``FirstStageResults`` take the same
+  keyword. ``IVGMM``, ``IVGMMCUE`` and ``IVJIVE`` do not, since they are not k-class
+  estimators (:issue:`823`, :issue:`850`, :issue:`870`).
+- ``fit`` of ``IV2SLS`` and ``IVLIML`` decomposes the instruments once instead of three
+  times (:issue:`870`).
+
 .. rubric:: Changes that alter results
 
 - A missing value of a categorical or string column is a missing value of each of its
@@ -54,11 +72,14 @@ be added to 7.1. 7.2 also contains the fixes below.
 
 - linearmodels 8.0 will raise the minimum versions of Python and NumPy, and of the other
   dependencies.
+- linearmodels 8.0 will use ``method="qr"`` by default in ``IV2SLS`` and ``IVLIML``.
+  Until then, they and the functions above issue a ``FutureWarning`` if ``method`` is
+  not given. Pass ``method="pinv"`` to keep the current results (:issue:`870`).
 
 .. rubric:: Contributors
 
-- Thanks to inchang-ing (:issue:`849`), jackiectl2 (:issue:`858`), CodingSelim
-  (:issue:`859`) and DresdenGman (:issue:`862`).
+- Thanks to inchang-ing (:issue:`849`, :issue:`850`), jackiectl2 (:issue:`858`),
+  CodingSelim (:issue:`859`) and DresdenGman (:issue:`862`).
 
 Version 7.1
 -----------

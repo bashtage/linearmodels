@@ -5,13 +5,14 @@ Instrumental variable estimators.
 from __future__ import annotations
 
 from collections.abc import Callable, Mapping
-from typing import Any, TypeVar, Union, cast
+from typing import Any, Literal, TypeVar, Union, cast
 import warnings
 
 from numpy import (
     all as npall,
     any as npany,
     array,
+    array_equal,
     asarray,
     atleast_2d,
     average,
@@ -33,11 +34,29 @@ from numpy import (
     squeeze,
     unique,
 )
-from numpy.linalg import LinAlgError, eigvalsh, inv, matrix_rank, norm, pinv, qr, solve
+from numpy.linalg import (
+    LinAlgError,
+    eigvalsh,
+    inv,
+    matrix_rank,
+    norm,
+    pinv,
+    qr,
+    solve,
+    svd,
+)
 from pandas import DataFrame, Series, concat
+from scipy.linalg import qr as sp_qr, solve_triangular
 from scipy.optimize import minimize
 
-from linearmodels.iv._utility import IVFormulaParser
+from linearmodels.iv._utility import (
+    IVFormulaParser,
+    full_column_rank,
+    kclass_factors,
+    kclass_solve,
+    orthonormal_basis,
+    resolve_method,
+)
 from linearmodels.iv.common import f_statistic, find_constant
 from linearmodels.iv.covariance import (
     KERNEL_LOOKUP,
@@ -161,6 +180,51 @@ WEIGHT_MATRICES = {
 # eigenvalue, and has no digits left.
 _KAPPA_TOLERANCE = float(sqrt(finfo(float64).eps))
 
+# With method="qr", [exog, endog] and [exog, instruments] are rank deficient if the
+# condition number of their columns, scaled to unit length, is at least 1e9. QR
+# estimates then have about 7 correct digits left.
+_RANK_TOLERANCE = 1e-9
+_RANK_MESSAGE = (
+    "The columns, scaled to unit length, are nearly collinear: their condition "
+    f"number is at least {1 / _RANK_TOLERANCE:g}."
+)
+_SCALE_HINT = (
+    ' They are only rank deficient because of their units. method="qr" tests the rank '
+    "after scaling the columns to unit length, and accepts them."
+)
+
+
+def _residuals(
+    y: linearmodels.typing.data.Float64Array,
+    basis: linearmodels.typing.data.Float64Array,
+) -> linearmodels.typing.data.Float64Array:
+    """The residuals of y on the columns of an orthonormal basis."""
+    return y - basis @ (basis.T @ y)
+
+
+def _kclass_pinv(
+    x: linearmodels.typing.data.Float64Array,
+    y: linearmodels.typing.data.Float64Array,
+    z: linearmodels.typing.data.Float64Array,
+    kappa: linearmodels.typing.Numeric,
+    pinvz: linearmodels.typing.data.Float64Array,
+) -> tuple[
+    linearmodels.typing.data.Float64Array,
+    linearmodels.typing.data.Float64Array,
+    linearmodels.typing.data.Float64Array,
+]:
+    """
+    The k-class estimate of method="pinv", with the arithmetic of linearmodels 7.1.
+
+    Also returns pinv(z) @ x and x'z @ pinv(z) @ x, which the covariance reuses.
+    """
+    xpz = x.T @ z
+    pinvz_x = pinvz @ x
+    xpz_pinvz_x = xpz @ pinvz_x
+    p1 = (x.T @ x) * (1 - kappa) + kappa * xpz_pinvz_x
+    p2 = (x.T @ y) * (1 - kappa) + kappa * (xpz @ (pinvz @ y))
+    return inv(p1) @ p2, pinvz_x, xpz_pinvz_x
+
 
 class _IVModelBase:
     r"""
@@ -188,6 +252,12 @@ class _IVModelBase:
     kappa : float, optional
         Parameter value for k-class estimation. If not provided, it is computed to
         produce the LIML parameter estimate.
+    method : {"pinv", "qr"}, optional
+        Numerical method, not case sensitive. "qr" is more accurate and does not
+        depend on the units of the variables. "pinv" is the method of linearmodels
+        7.1. If not given, "pinv" is used and a ``FutureWarning`` is issued, since
+        the default will be "qr" in linearmodels 8.0. See the Notes of
+        :class:`IV2SLS`.
 
     Raises
     ------
@@ -197,9 +267,16 @@ class _IVModelBase:
         does not have full column rank, if all observations have a missing value,
         if the inputs have different numbers of observations or labels that do
         not match (see Notes), if ``weights`` are not strictly positive and
-        finite, or if ``kappa`` or ``fuller`` is not a scalar.
+        finite, if ``kappa`` or ``fuller`` is not a scalar, or if ``method`` is
+        not "pinv", "qr" or None.
     TypeError
         If an input is complex or cannot be converted to float64.
+
+    Warns
+    -----
+    FutureWarning
+        If ``method`` is not given, since the default will change from "pinv" to
+        "qr" in linearmodels 8.0.
 
     See Also
     --------
@@ -247,7 +324,10 @@ class _IVModelBase:
         weights: IVDataLike | None = None,
         fuller: linearmodels.typing.Numeric = 0,
         kappa: linearmodels.typing.OptionalNumeric = None,
+        method: Literal["pinv", "qr"] | None = "pinv",
     ):
+        # IVGMM, IVGMMCUE and IVJIVE do not take method, and use "pinv"
+        self._numerical_method = resolve_method(method, type(self).__name__)
         self.dependent = IVData(dependent, var_name="dependent")
         nobs: int = self.dependent.shape[0]
         self.exog = IVData(exog, var_name="exog", nobs=nobs)
@@ -473,13 +553,22 @@ class _IVModelBase:
                 "as large as the number of endogenous regressors"
                 " ({}).".format(self.instruments.shape[1], self.endog.shape[1])
             )
-        if matrix_rank(x) < x.shape[1]:
-            raise ValueError("regressors [exog endog] do not have full column rank")
-        if matrix_rank(z) < z.shape[1]:
-            raise ValueError(
-                "instruments [exog instruments]  do not have full column rank"
-            )
+        checks = (
+            (x, "regressors [exog endog] do not have full column rank"),
+            (z, "instruments [exog instruments]  do not have full column rank"),
+        )
+        for a, message in checks:
+            if self._numerical_method == "qr":
+                # Tested on the columns scaled to unit length, so not on their units
+                if not full_column_rank(a, _RANK_TOLERANCE):
+                    raise ValueError(f"{message}. {_RANK_MESSAGE}")
+            elif matrix_rank(a) < a.shape[1]:
+                hint = self._supports_qr and full_column_rank(a, _RANK_TOLERANCE)
+                raise ValueError(message + ("." + _SCALE_HINT if hint else ""))
         self._has_constant, self._const_loc = has_constant(x)
+
+    # The k-class models can be estimated with method="qr"
+    _supports_qr = False
 
     def _drop_missing(self) -> linearmodels.typing.data.BoolArray:
         data = (self.dependent, self.exog, self.endog, self.instruments, self.weights)
@@ -586,7 +675,9 @@ class _IVModelBase:
             cov = restriction @ cov @ restriction.T
         return f_statistic(params, cov, debiased, nobs - nvar, const_loc)
 
-    def _estimate_kappa(self) -> float:
+    def _estimate_kappa(
+        self,
+    ) -> tuple[float, linearmodels.typing.data.Float64Array]:
         """
         The value of kappa in LIML, which is the same for any estimator
 
@@ -597,6 +688,9 @@ class _IVModelBase:
             exogenous regressors, relative to the cross product of the residuals on
             the exogenous regressors and instruments. The residuals are those of the
             dependent variable and the endogenous regressors.
+        ndarray
+            The decomposition of the instruments, which fit reuses: the orthonormal
+            basis with method="qr", and pinv with "pinv".
 
         Raises
         ------
@@ -613,11 +707,12 @@ class _IVModelBase:
         Whether the residuals are linearly dependent does not depend on the units of
         the variables: the count of observations does not, and the rank is tested on
         residuals that are scaled to have columns of unit length. Kappa is computed
-        from the residuals as they are. Two cases are not covered, see issue 823. The
-        accuracy of kappa depends on the units of the variables if there are 2 or more
-        endogenous regressors, and a regressor that is exactly a linear combination of
-        the exogenous regressors and instruments, which has residuals that are only
-        rounding error, is not detected.
+        from the residuals as they are. Two cases are not covered, see issue 823. With
+        method="pinv", the accuracy of kappa depends on the units of the variables if
+        there are 2 or more endogenous regressors. With either method, a regressor
+        that is exactly a linear combination of the exogenous regressors and
+        instruments, which has residuals that are only rounding error, is not
+        detected.
         """
         y, x, z = self._wy, self._wx, self._wz
         is_exog = self._regressor_is_exog
@@ -639,11 +734,25 @@ class _IVModelBase:
                 "and instruments are linearly independent."
             )
 
-        ez = e - z @ (pinv(z) @ e)
-        if x1.shape[1] == 0:  # No exogenous regressors
-            ex1 = e
+        qr_method = self._numerical_method == "qr"
+        # x1 is z without endogenous regressors and instruments, as in OLS
+        same = x1.shape == z.shape and array_equal(x1, z)
+        # The residuals on x1 are computed before z is decomposed, so that the two
+        # decompositions are not in memory at the same time
+        ex1 = e
+        if x1.shape[1] > 0 and not same:
+            if qr_method:
+                ex1 = _residuals(e, orthonormal_basis(x1))
+            else:
+                ex1 = e - x1 @ (pinv(x1) @ e)
+        if qr_method:
+            z_dec = orthonormal_basis(z)
+            ez = _residuals(e, z_dec)
         else:
-            ex1 = e - x1 @ (pinv(x1) @ e)
+            z_dec = pinv(z)
+            ez = e - z @ (z_dec @ e)
+        if same:
+            ex1 = ez
 
         # The rank is tested on a copy of the residuals with columns of unit length, so
         # that it does not depend on the units of the variables. A column that is exactly
@@ -661,9 +770,17 @@ class _IVModelBase:
                 "inverted to estimate kappa, is singular."
             )
 
+        if qr_method:
+            # The eigenvalues of (ez'ez)^(-1/2) (ex1'ex1) (ez'ez)^(-1/2) are the
+            # squared singular values of ex1 R^-1, where ez = QR. This does not form
+            # the cross products, and does not depend on the units of the variables
+            r = sp_qr(ez, mode="raw", check_finite=False)[1]
+            scaled_ex1 = solve_triangular(r, ex1.T, trans="T").T
+            return float(svd(scaled_ex1, compute_uv=False)[-1] ** 2), z_dec
+
         vpmzv_sqinv = inv_sqrth(ez.T @ ez)
         q = vpmzv_sqinv @ (ex1.T @ ex1) @ vpmzv_sqinv
-        return min(eigvalsh(q))
+        return min(eigvalsh(q)), z_dec
 
     def _post_estimation(
         self,
@@ -746,6 +863,12 @@ class _IVLSModelBase(_IVModelBase):
     kappa : float, optional
         Parameter value for k-class estimation. If not provided, it is computed to
         produce the LIML parameter estimate.
+    method : {"pinv", "qr"}, optional
+        Numerical method, not case sensitive. "qr" is more accurate and does not
+        depend on the units of the variables. "pinv" is the method of linearmodels
+        7.1. If not given, "pinv" is used and a ``FutureWarning`` is issued, since
+        the default will be "qr" in linearmodels 8.0. See the Notes of
+        :class:`IV2SLS`.
 
     Raises
     ------
@@ -755,9 +878,16 @@ class _IVLSModelBase(_IVModelBase):
         does not have full column rank, if all observations have a missing value,
         if the inputs have different numbers of observations or labels that do
         not match (see Notes), if ``weights`` are not strictly positive and
-        finite, or if ``kappa`` or ``fuller`` is not a scalar.
+        finite, if ``kappa`` or ``fuller`` is not a scalar, or if ``method`` is
+        not "pinv", "qr" or None.
     TypeError
         If an input is complex or cannot be converted to float64.
+
+    Warns
+    -----
+    FutureWarning
+        If ``method`` is not given, since the default will change from "pinv" to
+        "qr" in linearmodels 8.0.
 
     See Also
     --------
@@ -805,6 +935,7 @@ class _IVLSModelBase(_IVModelBase):
         weights: IVDataLike | None = None,
         fuller: linearmodels.typing.Numeric = 0,
         kappa: linearmodels.typing.OptionalNumeric = None,
+        method: Literal["pinv", "qr"] | None = None,
     ):
         super().__init__(
             dependent,
@@ -814,7 +945,10 @@ class _IVLSModelBase(_IVModelBase):
             weights=weights,
             fuller=fuller,
             kappa=kappa,
+            method=method,
         )
+
+    _supports_qr = True
 
     @staticmethod
     def estimate_parameters(
@@ -822,6 +956,8 @@ class _IVLSModelBase(_IVModelBase):
         y: linearmodels.typing.data.Float64Array,
         z: linearmodels.typing.data.Float64Array,
         kappa: linearmodels.typing.Numeric,
+        *,
+        method: Literal["pinv", "qr"] | None = None,
     ) -> linearmodels.typing.data.Float64Array:
         """
         Parameter estimation without error checking.
@@ -836,6 +972,12 @@ class _IVLSModelBase(_IVModelBase):
             Instrument matrix (nobs by ninstr).
         kappa : float
             Parameter value for k-class estimator.
+        method : {"pinv", "qr"}, optional
+            Numerical method, see :class:`IV2SLS`. With "qr", z must have full
+            column rank. If not given, "pinv" is used and a ``FutureWarning`` is
+            issued, since the default will be "qr" in linearmodels 8.0.
+
+            .. versionadded:: 7.2
 
         Returns
         -------
@@ -847,10 +989,11 @@ class _IVLSModelBase(_IVModelBase):
         Exposed as a static method to facilitate estimation with other data,
         e.g., bootstrapped samples.  Performs no error checking.
         """
-        pinvz = pinv(z)
-        p1 = (x.T @ x) * (1 - kappa) + kappa * ((x.T @ z) @ (pinvz @ x))
-        p2 = (x.T @ y) * (1 - kappa) + kappa * ((x.T @ z) @ (pinvz @ y))
-        return inv(p1) @ p2
+        method = resolve_method(method, "estimate_parameters")
+        if method == "pinv":
+            return _kclass_pinv(x, y, z, kappa, pinv(z))[0]
+        factors = kclass_factors(x, orthonormal_basis(z), float(kappa), y)
+        return kclass_solve(factors)
 
     def fit(
         self, *, cov_type: str = "robust", debiased: bool = False, **cov_config: Any
@@ -937,15 +1080,20 @@ class _IVLSModelBase(_IVModelBase):
         See the docstring of the specific covariance estimator for a list of
         supported options. Defaults are used if no covariance configuration
         is provided.
+
+        The estimates and their covariance use the ``method`` of the model, see
+        the Notes of :class:`IV2SLS`.
         """
         cov_type = lower_option(cov_type)
         check_cov_config(cov_config, cov_type, _LS_COV_KEYS, KERNEL_LOOKUP)
         self._check_clusters(cov_config)
         wy, wx, wz = self._wy, self._wx, self._wz
         kappa = self._kappa
-
+        # One decomposition of the instruments, by _estimate_kappa, for kappa, the
+        # estimate and the covariance
+        z_dec: linearmodels.typing.data.Float64Array | None = None
         try:
-            liml_kappa: float = self._estimate_kappa()
+            liml_kappa, z_dec = self._estimate_kappa()
         except Exception as exc:
             liml_kappa = nan
             if kappa is None:
@@ -963,14 +1111,26 @@ class _IVLSModelBase(_IVModelBase):
             nobs, ninstr = wz.shape
             est_kappa -= self._fuller / (nobs - ninstr)
 
-        params = self.estimate_parameters(wx, wy, wz, est_kappa)
+        reuse: dict[str, Any]
+        if self._numerical_method == "qr":
+            z_basis = orthonormal_basis(wz) if z_dec is None else z_dec
+            factors = kclass_factors(wx, z_basis, float(est_kappa), wy)
+            params = kclass_solve(factors)
+            reuse = {"z_basis": z_basis, "factors": factors}
+        else:
+            pinvz = pinv(wz) if z_dec is None else z_dec
+            params, pinvz_x, xpz_pinvz_x = _kclass_pinv(wx, wy, wz, est_kappa, pinvz)
+            reuse = {"pinvz": pinvz, "pinvz_x": pinvz_x, "xpz_pinvz_x": xpz_pinvz_x}
 
         cov_estimator = lookup_option(COVARIANCE_ESTIMATORS, cov_type, "cov_type")
         cov_config["debiased"] = debiased
         cov_config["kappa"] = est_kappa
         cov_config_copy = dict(cov_config.items())
         cov_config_copy.pop("center", None)
-        cov_estimator_inst = cov_estimator(wx, wy, wz, params, **cov_config_copy)
+        cov_estimator_inst = cov_estimator(
+            wx, wy, wz, params, method=self._numerical_method, **cov_config_copy
+        )
+        cov_estimator_inst._reuse(**reuse)
 
         results = {"kappa": est_kappa, "liml_kappa": liml_kappa}
         pe = self._post_estimation(params, cov_estimator_inst, cov_type)
@@ -1008,6 +1168,12 @@ class IVLIML(_IVLSModelBase):
     kappa : float, optional
         Parameter value for k-class estimation. If not provided, it is computed to
         produce the LIML parameter estimate.
+    method : {"pinv", "qr"}, optional
+        Numerical method, not case sensitive. "qr" is more accurate and does not
+        depend on the units of the variables. "pinv" is the method of linearmodels
+        7.1. If not given, "pinv" is used and a ``FutureWarning`` is issued, since
+        the default will be "qr" in linearmodels 8.0. See the Notes of
+        :class:`IV2SLS`.
 
     Raises
     ------
@@ -1017,9 +1183,16 @@ class IVLIML(_IVLSModelBase):
         does not have full column rank, if all observations have a missing value,
         if the inputs have different numbers of observations or labels that do
         not match (see Notes), if ``weights`` are not strictly positive and
-        finite, or if ``kappa`` or ``fuller`` is not a scalar.
+        finite, if ``kappa`` or ``fuller`` is not a scalar, or if ``method`` is
+        not "pinv", "qr" or None.
     TypeError
         If an input is complex or cannot be converted to float64.
+
+    Warns
+    -----
+    FutureWarning
+        If ``method`` is not given, since the default will change from "pinv" to
+        "qr" in linearmodels 8.0.
 
     See Also
     --------
@@ -1082,6 +1255,12 @@ class IVLIML(_IVLSModelBase):
        endogenous regressor and one instrument. It was NaN on some platforms, with
        the estimates and their covariance, and a ``RuntimeWarning`` was emitted.
 
+    ``method`` is described in the Notes of :class:`IV2SLS`.
+
+    .. versionadded:: 7.2
+
+       The ``method`` keyword.
+
     Rows are paired by position. An input that carries labels (a pandas
     Series or DataFrame with an index other than the default 0, 1, ..., n-1,
     or an xarray DataArray with coordinates) must use the same index, in the
@@ -1114,6 +1293,7 @@ class IVLIML(_IVLSModelBase):
         weights: IVDataLike | None = None,
         fuller: linearmodels.typing.Numeric = 0,
         kappa: linearmodels.typing.OptionalNumeric = None,
+        method: Literal["pinv", "qr"] | None = None,
     ):
         super().__init__(
             dependent,
@@ -1123,6 +1303,7 @@ class IVLIML(_IVLSModelBase):
             weights=weights,
             fuller=fuller,
             kappa=kappa,
+            method=method,
         )
 
     @staticmethod
@@ -1133,6 +1314,7 @@ class IVLIML(_IVLSModelBase):
         weights: IVDataLike | None = None,
         fuller: float = 0,
         kappa: linearmodels.typing.OptionalNumeric = None,
+        method: Literal["pinv", "qr"] | None = None,
     ) -> IVLIML:
         """
         Create a model from a formula.
@@ -1155,6 +1337,12 @@ class IVLIML(_IVLSModelBase):
         kappa : float, optional
             Parameter value for k-class estimation. If not provided, it is computed
             to produce the LIML parameter estimate.
+        method : {"pinv", "qr"}, optional
+            Numerical method, not case sensitive. "qr" is more accurate and does not
+            depend on the units of the variables. "pinv" is the method of
+            linearmodels 7.1. If not given, "pinv" is used and a ``FutureWarning`` is
+            issued, since the default will be "qr" in linearmodels 8.0. See the Notes
+            of :class:`IV2SLS`.
 
         Returns
         -------
@@ -1193,7 +1381,14 @@ class IVLIML(_IVLSModelBase):
         parser = IVFormulaParser(formula, data)
         dep, exog, endog, instr = parser.data
         mod: IVLIML = IVLIML(
-            dep, exog, endog, instr, weights=weights, fuller=fuller, kappa=kappa
+            dep,
+            exog,
+            endog,
+            instr,
+            weights=weights,
+            fuller=fuller,
+            kappa=kappa,
+            method=method,
         )
         mod.formula = formula
         return mod
@@ -1219,6 +1414,11 @@ class IV2SLS(_IVLSModelBase):
         Observation weights used in estimation. The weights must be strictly positive
         and finite. They are rescaled to have a mean of 1. A NaN weight is missing, and
         its observation is dropped. The default is to weight all observations equally.
+    method : {"pinv", "qr"}, optional
+        Numerical method, not case sensitive. "qr" is more accurate and does not
+        depend on the units of the variables. "pinv" is the method of linearmodels
+        7.1. If not given, "pinv" is used and a ``FutureWarning`` is issued, since
+        the default will be "qr" in linearmodels 8.0. See Notes.
 
     Raises
     ------
@@ -1227,10 +1427,16 @@ class IV2SLS(_IVLSModelBase):
         endogenous regressors, if ``[exog, endog]`` or ``[exog, instruments]``
         does not have full column rank, if all observations have a missing value,
         if the inputs have different numbers of observations or labels that do
-        not match (see Notes), or if ``weights`` are not strictly positive and
-        finite.
+        not match (see Notes), if ``weights`` are not strictly positive and
+        finite, or if ``method`` is not "pinv", "qr" or None.
     TypeError
         If an input is complex or cannot be converted to float64.
+
+    Warns
+    -----
+    FutureWarning
+        If ``method`` is not given, since the default will change from "pinv" to
+        "qr" in linearmodels 8.0.
 
     See Also
     --------
@@ -1266,6 +1472,21 @@ class IV2SLS(_IVLSModelBase):
        :math:`\kappa` is not defined. Earlier versions computed them from the
        rounding error of a singular matrix, or the statistics were NaN.
 
+    ``method="qr"`` computes the estimates, their covariance and the kappa of LIML
+    from QR decompositions, as R's ``ivreg`` does, and treats ``[exog, endog]`` or
+    ``[exog, instruments]`` as rank deficient if the condition number of its columns,
+    scaled to unit length, is at least 1e9. With c that condition number, about
+    16 - log10(c) digits of the estimates are correct. ``"pinv"`` inverts cross
+    products, so only about 16 - 2 log10(c) digits are correct, e.g., 6 at c = 1e5
+    and none at c = 1e8. It also tests the rank of the columns as they are, so it
+    rejects columns on very different scales and accepts nearly collinear ones, such
+    as a variable and its square. ``"pinv"`` is the default until linearmodels 8.0,
+    when the default becomes ``"qr"``.
+
+    .. versionadded:: 7.2
+
+       The ``method`` keyword.
+
     Rows are paired by position. An input that carries labels (a pandas
     Series or DataFrame with an index other than the default 0, 1, ..., n-1,
     or an xarray DataArray with coordinates) must use the same index, in the
@@ -1296,15 +1517,27 @@ class IV2SLS(_IVLSModelBase):
         instruments: IVDataLike | None,
         *,
         weights: IVDataLike | None = None,
+        method: Literal["pinv", "qr"] | None = None,
     ):
         self._method = "IV-2SLS"
         super().__init__(
-            dependent, exog, endog, instruments, weights=weights, fuller=0, kappa=1
+            dependent,
+            exog,
+            endog,
+            instruments,
+            weights=weights,
+            fuller=0,
+            kappa=1,
+            method=method,
         )
 
     @staticmethod
     def from_formula(
-        formula: str, data: DataFrame, *, weights: IVDataLike | None = None
+        formula: str,
+        data: DataFrame,
+        *,
+        weights: IVDataLike | None = None,
+        method: Literal["pinv", "qr"] | None = None,
     ) -> IV2SLS:
         """
         Create a model from a formula.
@@ -1321,6 +1554,12 @@ class IV2SLS(_IVLSModelBase):
             positive and finite. They are rescaled to have a mean of 1. A NaN weight is
             missing, and its observation is dropped. The default is to weight all
             observations equally.
+        method : {"pinv", "qr"}, optional
+            Numerical method, not case sensitive. "qr" is more accurate and does not
+            depend on the units of the variables. "pinv" is the method of
+            linearmodels 7.1. If not given, "pinv" is used and a ``FutureWarning`` is
+            issued, since the default will be "qr" in linearmodels 8.0. See the Notes
+            of :class:`IV2SLS`.
 
         Returns
         -------
@@ -1358,7 +1597,7 @@ class IV2SLS(_IVLSModelBase):
         """
         parser = IVFormulaParser(formula, data)
         dep, exog, endog, instr = parser.data
-        mod = IV2SLS(dep, exog, endog, instr, weights=weights)
+        mod = IV2SLS(dep, exog, endog, instr, weights=weights, method=method)
         mod.formula = formula
         return mod
 
@@ -2810,6 +3049,9 @@ class _OLS(IVLIML):
         Observation weights used in estimation. The weights must be strictly positive
         and finite. They are rescaled to have a mean of 1. A NaN weight is missing, and
         its observation is dropped. The default is to weight all observations equally.
+    method : {"pinv", "qr"}, optional
+        The numerical method, see :class:`IV2SLS`. The default is "pinv", which
+        does not warn. The models pass their own method.
 
     See Also
     --------
@@ -2844,8 +3086,11 @@ class _OLS(IVLIML):
         exog: IVDataLike,
         *,
         weights: IVDataLike | None = None,
+        method: Literal["pinv", "qr"] | None = "pinv",
     ):
-        super().__init__(dependent, exog, None, None, weights=weights, kappa=0.0)
+        super().__init__(
+            dependent, exog, None, None, weights=weights, kappa=0.0, method=method
+        )
         self._result_container = OLSResults
 
 
@@ -3347,7 +3592,7 @@ class IVJIVE(_IVModelBase):
         )
         results = self._post_estimation(params, cov_estimator, cov_type)
         try:
-            liml_kappa = self._estimate_kappa()
+            liml_kappa = self._estimate_kappa()[0]
         except LinAlgError:
             # Only needed for two tests of overidentification
             liml_kappa = nan

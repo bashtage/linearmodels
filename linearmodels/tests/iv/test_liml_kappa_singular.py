@@ -309,7 +309,7 @@ def previous_kappa(model):
 
 
 def current_kappa(model):
-    return model._estimate_kappa()
+    return model._estimate_kappa()[0]
 
 
 def kappa_or_none(function, model):
@@ -579,6 +579,7 @@ def test_no_warnings_if_kappa_is_not_defined(design):
     y, exog, endog, instr = data_for(design)
     with warnings.catch_warnings():
         warnings.simplefilter("error")
+        warnings.filterwarnings("ignore", "The default method", FutureWarning)
         with pytest.raises(ValueError, match="Unable to estimate kappa"):
             IVLIML(*args(y, exog, endog, instr)).fit()
         IVLIML(*args(y, exog, endog, instr), kappa=1.0).fit()
@@ -629,6 +630,7 @@ def test_no_warnings_from_the_tests_if_kappa_is_not_defined(design):
     y, exog, endog, instr = data_for(design)
     with warnings.catch_warnings():
         warnings.simplefilter("error")
+        warnings.filterwarnings("ignore", "The default method", FutureWarning)
         res = IV2SLS(*args(y, exog, endog, instr)).fit()
         # str of the tests does not warn
         anderson_rubin, basmann_f = str(res.anderson_rubin), str(res.basmann_f)
@@ -641,6 +643,7 @@ def test_no_warnings_if_kappa_is_defined(design):
     y, exog, endog, instr = data_for(design)
     with warnings.catch_warnings():
         warnings.simplefilter("error")
+        warnings.filterwarnings("ignore", "The default method", FutureWarning)
         for model in MODELS:
             model(*args(y, exog, endog, instr)).fit()
 
@@ -664,6 +667,7 @@ def test_collinear_residuals_are_singular(scale):
     mod = IVLIML(*args(y, exog, endog, instr))
     with warnings.catch_warnings():
         warnings.simplefilter("error")
+        warnings.filterwarnings("ignore", "The default method", FutureWarning)
         with pytest.raises(ValueError, match="Unable to estimate kappa"):
             mod.fit()
         with pytest.raises(LinAlgError, match="linearly dependent"):
@@ -698,6 +702,7 @@ def test_zero_dependent_variable_is_singular():
     y = np.zeros(60)
     with warnings.catch_warnings():
         warnings.simplefilter("error")
+        warnings.filterwarnings("ignore", "The default method", FutureWarning)
         with pytest.raises(ValueError, match="Unable to estimate kappa"):
             IVLIML(*args(y, exog, endog, instr)).fit()
         res = IV2SLS(*args(y, exog, endog, instr)).fit()

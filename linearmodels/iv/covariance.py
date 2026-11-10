@@ -5,7 +5,7 @@ Covariance estimation for 2SLS and LIML IV estimators.
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import Any, Union, cast
+from typing import Any, Literal, Union, cast
 
 from mypy_extensions import VarArg
 from numpy import (
@@ -15,6 +15,7 @@ from numpy import (
     cos,
     empty,
     errstate,
+    eye,
     isfinite,
     ndarray,
     ones,
@@ -25,7 +26,14 @@ from numpy import (
     zeros,
 )
 from numpy.linalg import inv, pinv
+from scipy.linalg import solve_triangular
 
+from linearmodels.iv._utility import (
+    KClassFactors,
+    kclass_factors,
+    orthonormal_basis,
+    resolve_method,
+)
 from linearmodels.shared.covariance import cluster_union, cov_cluster, cov_kernel
 from linearmodels.shared.exceptions import lower_option, unknown_option_error
 from linearmodels.shared.inputs import as_ndarray
@@ -463,6 +471,13 @@ class HomoskedasticCovariance:
         of x, for example the absorbed effects of AbsorbingLS. The default is 0.
         It is only used if ``debiased`` is True, when n / (n-k) becomes
         n / (n-k-extra_df).
+    method : {"pinv", "qr"}, optional
+        Numerical method, see :class:`~linearmodels.iv.model.IV2SLS`. With "qr", z
+        must have full column rank. If not given, "pinv" is used and a
+        ``FutureWarning`` is issued, since the default will be "qr" in linearmodels
+        8.0.
+
+        .. versionadded:: 7.2
 
     Raises
     ------
@@ -505,6 +520,8 @@ class HomoskedasticCovariance:
         debiased: bool = False,
         kappa: linearmodels.typing.Numeric = 1,
         extra_df: int = 0,
+        *,
+        method: Literal["pinv", "qr"] | None = None,
     ):
         if not (x.shape[0] == y.shape[0] == z.shape[0]):
             raise ValueError("x, y and z must have the same number of rows")
@@ -518,7 +535,14 @@ class HomoskedasticCovariance:
         self._debiased = debiased
         self.eps = y - x @ params
         self._kappa = kappa
-        self._pinvz = pinv(z)
+        self._numerical_method = resolve_method(method, type(self).__name__)
+        # Decompositions of z and products with it, computed when first used or given
+        # by the model, see _reuse
+        self._pinvz: linearmodels.typing.data.Float64Array | None = None
+        self._pinvz_x: linearmodels.typing.data.Float64Array | None = None
+        self._xpz_pinvz_x: linearmodels.typing.data.Float64Array | None = None
+        self._z_basis: linearmodels.typing.data.Float64Array | None = None
+        self._factors: KClassFactors | None = None
         nobs, nvar = x.shape
         if self._debiased and extra_df > 0 and nobs - nvar - extra_df <= 0:
             raise ValueError(
@@ -541,36 +565,125 @@ class HomoskedasticCovariance:
             self.__str__() + "\n" + self.__class__.__name__ + f", id: {hex(id(self))}"
         )
 
-    @property
-    def s(self) -> linearmodels.typing.data.Float64Array:
-        """Return the score covariance estimate."""
-        x, z, eps = self.x, self.z, self.eps
+    def _reuse(
+        self,
+        *,
+        pinvz: linearmodels.typing.data.Float64Array | None = None,
+        pinvz_x: linearmodels.typing.data.Float64Array | None = None,
+        xpz_pinvz_x: linearmodels.typing.data.Float64Array | None = None,
+        z_basis: linearmodels.typing.data.Float64Array | None = None,
+        factors: KClassFactors | None = None,
+    ) -> None:
+        """
+        Use what the model computed from the same x, z and kappa.
+
+        With method="pinv", pinv(z), pinv(z) @ x and x'z @ pinv(z) @ x. With "qr",
+        the orthonormal basis of z and the factors of the k-class estimator.
+        """
+        self._pinvz, self._pinvz_x, self._xpz_pinvz_x = pinvz, pinvz_x, xpz_pinvz_x
+        self._z_basis, self._factors = z_basis, factors
+
+    def _pinv_z(self) -> linearmodels.typing.data.Float64Array:
+        """pinv(z), used with method="pinv", computed once."""
+        if self._pinvz is None:
+            self._pinvz = pinv(self.z)
+        return self._pinvz
+
+    def _pinv_z_x(self) -> linearmodels.typing.data.Float64Array:
+        """pinv(z) @ x, used with method="pinv", computed once."""
+        if self._pinvz_x is None:
+            self._pinvz_x = self._pinv_z() @ self.x
+        return self._pinvz_x
+
+    def _basis(self) -> linearmodels.typing.data.Float64Array:
+        """Orthonormal basis of the instruments, used with method="qr"."""
+        if self._z_basis is None:
+            self._z_basis = orthonormal_basis(self.z)
+        return self._z_basis
+
+    def _kclass_factors(self) -> KClassFactors:
+        """Factors of the cross products of the k-class estimator, computed once."""
+        if self._factors is None:
+            self._factors = kclass_factors(self.x, self._basis(), float(self._kappa))
+        return self._factors
+
+    def _xhat(self) -> linearmodels.typing.data.Float64Array:
+        """The projection of x on z, which are the regressors of the scores."""
+        if self._numerical_method == "pinv":
+            return self.z @ self._pinv_z_x()
+        z_basis = self._basis()
+        return z_basis @ (z_basis.T @ self.x)
+
+    def _pinv_v(self) -> linearmodels.typing.data.Float64Array:
+        """V of method="pinv", the k-class cross product of x divided by nobs."""
+        x, z = self.x, self.z
         nobs = x.shape[0]
-        s2 = eps.T @ eps / nobs
-        pinvz = self._pinvz
-        v = (x.T @ z) @ (pinvz @ x) / nobs
+        if self._xpz_pinvz_x is None:
+            self._xpz_pinvz_x = (x.T @ z) @ self._pinv_z_x()
+        v = self._xpz_pinvz_x / nobs
         if self._kappa != 1:
             kappa = self._kappa
             xpx = x.T @ x / nobs
             v = (1 - kappa) * xpx + kappa * v
+        return v
+
+    def _rotated_scores(self) -> linearmodels.typing.data.Float64Array:
+        r"""
+        The scores in the coordinates of the triangular factor.
+
+        These are :math:`\hat{\epsilon}_i \hat{x}_i R^{-1}`, where
+        :math:`\hat{x}_i` is the projection of :math:`x_i` on the instruments. The
+        columns are well conditioned, even if the columns of :math:`\hat{x}` are
+        nearly collinear or on very different scales.
+        """
+        u = self._kclass_factors().u
+        return asarray((self._basis() @ u) * self.eps, dtype=float)
+
+    def _rotated_s(self) -> linearmodels.typing.data.Float64Array:
+        r"""
+        The score covariance in the coordinates of the triangular factor.
+
+        This is :math:`R^{-T} \hat{S} R^{-1}`. It is computed from the rotated
+        scores, or from :math:`G` if the covariance is homoskedastic.
+        """
+        nobs, nvar = self.x.shape
+        eps = self.eps
+        s2 = eps.T @ eps / nobs
+        g = self._kclass_factors().g
+        g = eye(nvar) if g is None else g
+        return self._scale * s2 * g / nobs
+
+    @property
+    def s(self) -> linearmodels.typing.data.Float64Array:
+        """Return the score covariance estimate."""
+        nobs = self.x.shape[0]
+        eps = self.eps
+        s2 = eps.T @ eps / nobs
+        if self._numerical_method == "pinv":
+            v = self._pinv_v()
+        else:
+            factors = self._kclass_factors()
+            r, g = factors.r, factors.g
+            v = (r.T @ r if g is None else r.T @ g @ r) / nobs
 
         return self._scale * s2 * v
 
     @property
     def cov(self) -> linearmodels.typing.data.Float64Array:
         """Return the covariance of the estimated parameters."""
-        x, z = self.x, self.z
-        nobs = x.shape[0]
-
-        pinvz = self._pinvz
-        v = (x.T @ z) @ (pinvz @ x) / nobs
-        if self._kappa != 1:
-            kappa = self._kappa
-            xpx = x.T @ x / nobs
-            v = (1 - kappa) * xpx + kappa * v
-
-        vinv = inv(v)
-        c = vinv @ self.s @ vinv / nobs
+        nobs, nvar = self.x.shape
+        if self._numerical_method == "pinv":
+            vinv = inv(self._pinv_v())
+            c = vinv @ self.s @ vinv / nobs
+            return (c + c.T) / 2
+        factors = self._kclass_factors()
+        # V = R'GR / n, so that V^-1 S V^-1 / n = n R^-1 G^-1 (R^-T S R^-1) G^-1 R^-T.
+        # R is only used in triangular solves, so that the condition number of the
+        # regressors is not squared
+        b = solve_triangular(factors.r, eye(nvar))
+        if factors.g is not None:
+            b = b @ inv(factors.g)
+        c = nobs * (b @ self._rotated_s() @ b.T)
         return (c + c.T) / 2
 
     @property
@@ -616,6 +729,13 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
         of x, for example the absorbed effects of AbsorbingLS. The default is 0.
         It is only used if ``debiased`` is True, when n / (n-k) becomes
         n / (n-k-extra_df).
+    method : {"pinv", "qr"}, optional
+        Numerical method, see :class:`~linearmodels.iv.model.IV2SLS`. With "qr", z
+        must have full column rank. If not given, "pinv" is used and a
+        ``FutureWarning`` is issued, since the default will be "qr" in linearmodels
+        8.0.
+
+        .. versionadded:: 7.2
 
     Raises
     ------
@@ -660,20 +780,25 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
         debiased: bool = False,
         kappa: linearmodels.typing.Numeric = 1,
         extra_df: int = 0,
+        *,
+        method: Literal["pinv", "qr"] | None = None,
     ):
-        super().__init__(x, y, z, params, debiased, kappa, extra_df)
+        super().__init__(x, y, z, params, debiased, kappa, extra_df, method=method)
         self._name = "Robust Covariance (Heteroskedastic)"
 
     @property
     def s(self) -> linearmodels.typing.data.Float64Array:
         """Return the heteroskedasticity-robust score covariance estimate."""
-        x, z, eps = self.x, self.z, self.eps
-        nobs = x.shape[0]
-        pinvz = self._pinvz
-        xhat_e = z @ (pinvz @ x) * eps
+        nobs = self.x.shape[0]
+        xhat_e = self._xhat() * self.eps
         s = xhat_e.T @ xhat_e / nobs
 
         return self._scale * s
+
+    def _rotated_s(self) -> linearmodels.typing.data.Float64Array:
+        nobs = self.x.shape[0]
+        scores = self._rotated_scores()
+        return self._scale * (scores.T @ scores) / nobs
 
 
 class KernelCovariance(HomoskedasticCovariance):
@@ -715,6 +840,13 @@ class KernelCovariance(HomoskedasticCovariance):
         of x, for example the absorbed effects of AbsorbingLS. The default is 0.
         It is only used if ``debiased`` is True, when n / (n-k) becomes
         n / (n-k-extra_df).
+    method : {"pinv", "qr"}, optional
+        Numerical method, see :class:`~linearmodels.iv.model.IV2SLS`. With "qr", z
+        must have full column rank. If not given, "pinv" is used and a
+        ``FutureWarning`` is issued, since the default will be "qr" in linearmodels
+        8.0.
+
+        .. versionadded:: 7.2
 
     Raises
     ------
@@ -790,8 +922,10 @@ class KernelCovariance(HomoskedasticCovariance):
         debiased: bool = False,
         kappa: linearmodels.typing.Numeric = 1,
         extra_df: int = 0,
+        *,
+        method: Literal["pinv", "qr"] | None = None,
     ):
-        super().__init__(x, y, z, params, debiased, kappa, extra_df)
+        super().__init__(x, y, z, params, debiased, kappa, extra_df, method=method)
         self._kernels = KERNEL_LOOKUP
         kernel = lower_option(kernel)
         self._kernel = kernel
@@ -813,28 +947,40 @@ class KernelCovariance(HomoskedasticCovariance):
     @property
     def s(self) -> linearmodels.typing.data.Float64Array:
         """Return the HAC score covariance estimate."""
-        x, z, eps = self.x, self.z, self.eps
-        nobs = x.shape[0]
+        xhat = self._xhat()
+        return self._kernel_s(asarray(xhat * self.eps, dtype=float), xhat)
 
-        pinvz = self._pinvz
-        xhat = z @ (pinvz @ x)
-        xhat_e = asarray(xhat * eps, dtype=float)
+    def _rotated_s(self) -> linearmodels.typing.data.Float64Array:
+        return self._kernel_s(self._rotated_scores())
 
+    def _kernel_s(
+        self,
+        scores: linearmodels.typing.data.Float64Array,
+        xhat: linearmodels.typing.data.Float64Array | None = None,
+    ) -> linearmodels.typing.data.Float64Array:
+        """
+        The kernel estimate of the covariance of the scores.
+
+        The automatic bandwidth is selected from xhat * eps, the scores in the units
+        of x, whatever the coordinates of scores. xhat, the projection of x on z, is
+        computed if it is not given.
+        """
+        nobs = self.x.shape[0]
         kernel = self.config["kernel"]
         bw = self.config["bandwidth"]
         if bw is None:
             self._auto_bandwidth = True
-
+            xhat = self._xhat() if xhat is None else xhat
+            xhat_e = asarray(xhat * self.eps, dtype=float)
             const, loc = has_constant(xhat)
             sel = ones((xhat.shape[1], 1))
             if const and xhat.shape[1] > 1:
                 sel[loc] = 0
-            scores = xhat_e @ sel
-            bw = kernel_optimal_bandwidth(scores, kernel)
+            bw = kernel_optimal_bandwidth(xhat_e @ sel, kernel)
 
         self._bandwidth = bw
         w = self._kernels[kernel](bw, nobs - 1)
-        s = cov_kernel(xhat_e, w)
+        s = cov_kernel(scores, w)
 
         return cast("ndarray", self._scale * s)
 
@@ -877,6 +1023,13 @@ class ClusteredCovariance(HomoskedasticCovariance):
         of x, for example the absorbed effects of AbsorbingLS. The default is 0.
         It is only used if ``debiased`` is True, when n / (n-k) becomes
         n / (n-k-extra_df).
+    method : {"pinv", "qr"}, optional
+        Numerical method, see :class:`~linearmodels.iv.model.IV2SLS`. With "qr", z
+        must have full column rank. If not given, "pinv" is used and a
+        ``FutureWarning`` is issued, since the default will be "qr" in linearmodels
+        8.0.
+
+        .. versionadded:: 7.2
 
     Raises
     ------
@@ -925,8 +1078,10 @@ class ClusteredCovariance(HomoskedasticCovariance):
         debiased: bool = False,
         kappa: linearmodels.typing.Numeric = 1,
         extra_df: int = 0,
+        *,
+        method: Literal["pinv", "qr"] | None = None,
     ):
-        super().__init__(x, y, z, params, debiased, kappa, extra_df)
+        super().__init__(x, y, z, params, debiased, kappa, extra_df, method=method)
 
         nobs = x.shape[0]
         clusters = arange(nobs) if clusters is None else clusters
@@ -959,6 +1114,15 @@ class ClusteredCovariance(HomoskedasticCovariance):
     @property
     def s(self) -> linearmodels.typing.data.Float64Array:
         """Return the clustered estimator of the score covariance."""
+        return self._cluster_s(asarray(self._xhat() * self.eps, dtype=float))
+
+    def _rotated_s(self) -> linearmodels.typing.data.Float64Array:
+        return self._cluster_s(self._rotated_scores())
+
+    def _cluster_s(
+        self, xhat_e: linearmodels.typing.data.Float64Array
+    ) -> linearmodels.typing.data.Float64Array:
+        """The clustered estimate of the covariance of the scores."""
 
         def rescale(
             s: linearmodels.typing.data.Float64Array, nc: int, nobs: int
@@ -966,11 +1130,7 @@ class ClusteredCovariance(HomoskedasticCovariance):
             scale = float(self._scale * (nc / (nc - 1)) * ((nobs - 1) / nobs))
             return cast("ndarray", s * scale) if self.debiased else s
 
-        x, z, eps = self.x, self.z, self.eps
-        pinvz = self._pinvz
-        xhat_e = asarray(z @ (pinvz @ x) * eps, dtype=float)
-
-        nobs = x.shape[0]
+        nobs = self.x.shape[0]
         clusters = self._clusters
         if self._clusters.ndim == 1:
             s = cov_cluster(xhat_e, clusters)

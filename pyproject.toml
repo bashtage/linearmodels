@@ -286,6 +286,9 @@ filterwarnings = [
   # Development versions of pandas 3.1
   "error:Constructing a DataFrame from a list of sequences with mismatched::",
   "error:assert_index_equal will check the::",
+  # The default method of the IV models changes in 8.0. The tests of the warning are in
+  # linearmodels/tests/iv/test_numerical_method.py
+  "ignore:The default method of:FutureWarning",
 ]
 junit_family = "xunit2"
 markers = [

@@ -1,7 +1,11 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Any
+import os
+import sys
+from types import FrameType
+from typing import Any, Literal, NamedTuple, cast
+import warnings
 
 from formulaic import model_matrix
 from formulaic.formula import Formula
@@ -9,6 +13,7 @@ from formulaic.materializers.types import NAAction as fNAAction
 from formulaic.utils.context import capture_context
 import numpy as np
 from pandas import DataFrame
+from scipy.linalg import qr as sp_qr, qr_multiply, solve_triangular
 
 import linearmodels.typing.data
 
@@ -25,8 +30,73 @@ The original error was:
 """
 
 
+METHODS = ("pinv", "qr")
+
+FUTURE_DEFAULT_WARNING = (
+    'The default method of {name} will change from "pinv" to "qr" in linearmodels '
+    '8.0. Pass method="qr" to use the new method now, or method="pinv" to keep the '
+    "current one and silence this warning."
+)
+
+_IV_DIRECTORY = os.path.dirname(os.path.abspath(__file__))
+
+
+def _external_stacklevel() -> int:
+    """The stacklevel, seen from the caller, of the first frame outside iv/."""
+    frame: FrameType | None = sys._getframe(1)
+    level = 1
+    while (
+        frame is not None
+        and os.path.dirname(os.path.abspath(frame.f_code.co_filename)) == _IV_DIRECTORY
+    ):
+        frame = frame.f_back
+        level += 1
+    return level
+
+
+def resolve_method(
+    method: Literal["pinv", "qr"] | None, name: str
+) -> Literal["pinv", "qr"]:
+    """
+    Validate the method keyword, and warn if it is not given.
+
+    Parameters
+    ----------
+    method : {"pinv", "qr"}, optional
+        The numerical method, not case sensitive.
+    name : str
+        The name of the class or function, used in the warning.
+
+    Returns
+    -------
+    {"pinv", "qr"}
+        The method in lower case, "pinv" if method is None.
+
+    Raises
+    ------
+    ValueError
+        If method is not "pinv", "qr" or None.
+
+    Warns
+    -----
+    FutureWarning
+        If method is None, since the default becomes "qr" in linearmodels 8.0. Code
+        inside linearmodels always passes method.
+    """
+    if method is None:
+        message = FUTURE_DEFAULT_WARNING.format(name=name)
+        warnings.warn(message, FutureWarning, stacklevel=_external_stacklevel())
+        return "pinv"
+    if not isinstance(method, str) or method.lower() not in METHODS:
+        raise ValueError(f'method must be "pinv", "qr" or None, but it is {method!r}.')
+    return cast('Literal["pinv", "qr"]', method.lower())
+
+
 def proj(
-    y: linearmodels.typing.data.Float64Array, x: linearmodels.typing.data.Float64Array
+    y: linearmodels.typing.data.Float64Array,
+    x: linearmodels.typing.data.Float64Array,
+    *,
+    method: Literal["pinv", "qr"] = "pinv",
 ) -> linearmodels.typing.data.Float64Array:
     """
     Projection of y on x from y.
@@ -37,19 +107,43 @@ def proj(
         Array to project (nobs by nseries).
     x : ndarray
         Array to project onto (nobs by nvar).
+    method : {"pinv", "qr"}, optional
+        The numerical method. The default is "pinv". See Notes.
 
     Returns
     -------
     ndarray
         Projected values of y (nobs by nseries).
+
+    Notes
+    -----
+    Both methods drop the directions of x whose singular values are below
+    max(nobs, nvar) * eps times the largest. "pinv" uses the columns of x as they
+    are, so it can drop a column that is on a much smaller scale than the others.
+    "qr" scales the columns to unit length first, so it does not depend on their
+    units.
     """
     if x.shape[1] == 0:
         return np.zeros_like(y)
-    return x @ (np.linalg.pinv(x) @ y)
+    if method == "pinv":
+        return x @ (np.linalg.pinv(x) @ y)
+    scale = np.linalg.norm(x, axis=0)
+    scale[scale == 0] = 1.0
+    q, r = sp_qr(x / scale, mode="economic", overwrite_a=True, check_finite=False)
+    u, sv, _ = np.linalg.svd(r)
+    keep = sv > sv[0] * max(x.shape) * np.finfo(float).eps
+    if not keep.all():
+        # Rank deficient, e.g., a constant and a full set of dummies. x / scale = QR,
+        # so Q @ u are its left singular vectors
+        q = q @ u[:, keep]
+    return q @ (q.T @ y)
 
 
 def annihilate(
-    y: linearmodels.typing.data.Float64Array, x: linearmodels.typing.data.Float64Array
+    y: linearmodels.typing.data.Float64Array,
+    x: linearmodels.typing.data.Float64Array,
+    *,
+    method: Literal["pinv", "qr"] = "pinv",
 ) -> linearmodels.typing.data.Float64Array:
     """
     Remove projection of y on x from y.
@@ -60,13 +154,198 @@ def annihilate(
         Array to project (nobs by nseries).
     x : ndarray
         Array to project onto (nobs by nvar).
+    method : {"pinv", "qr"}, optional
+        The numerical method of the projection, see :func:`proj`. The default is
+        "pinv".
 
     Returns
     -------
     ndarray
         Residuals values of y minus y projected on x (nobs by nseries).
     """
-    return y - proj(y, x)
+    return y - proj(y, x, method=method)
+
+
+def full_column_rank(x: linearmodels.typing.data.Float64Array, tol: float) -> bool:
+    """
+    Test whether a matrix has full column rank after scaling its columns.
+
+    Parameters
+    ----------
+    x : ndarray
+        Matrix to test (nobs by nvar).
+    tol : float
+        Relative tolerance. x is rank deficient if the smallest singular value of x
+        with columns scaled to unit length is no larger than tol times the largest,
+        that is, if the condition number of that matrix is at least 1 / tol.
+
+    Returns
+    -------
+    bool
+        True if x has full column rank.
+
+    Notes
+    -----
+    The test does not depend on the units of the columns of x. A column that is 0
+    makes x rank deficient, and so do fewer rows than columns.
+    """
+    nobs, nvar = x.shape
+    if nobs < nvar:
+        return False
+    scale = np.linalg.norm(x, axis=0)
+    if not np.all(scale > 0):
+        return False
+    # The singular values of the triangular factor of the Householder QR
+    # decomposition are those of the scaled columns, with the same backward error
+    # as an SVD of the scaled columns, and the decomposition is cheaper
+    r = sp_qr(x / scale, mode="raw", overwrite_a=True, check_finite=False)[1]
+    sv = np.linalg.svd(r, compute_uv=False)
+    return bool(sv[-1] > tol * sv[0])
+
+
+def orthonormal_basis(
+    x: linearmodels.typing.data.Float64Array,
+) -> linearmodels.typing.data.Float64Array:
+    """
+    Orthonormal basis of the column space of a matrix with full column rank.
+
+    Parameters
+    ----------
+    x : ndarray
+        Matrix with full column rank (nobs by nvar), with nobs >= nvar.
+
+    Returns
+    -------
+    ndarray
+        The nobs by nvar factor Q of the Householder QR decomposition of x.
+    """
+    return sp_qr(x, mode="economic", check_finite=False)[0]
+
+
+class KClassFactors(NamedTuple):
+    r"""
+    Factors of the cross products of the k-class estimator.
+
+    With :math:`M_z = I - QQ'`, where Q is an orthonormal basis of the
+    instruments, the factors satisfy
+
+    .. math::
+
+        X'(I - \kappa M_z)X & = R'GR \\
+        X'(I - \kappa M_z)y & = R't \\
+        QQ'XR^{-1} & = QU
+
+    so that the k-class estimate is :math:`R^{-1}G^{-1}t`.
+    """
+
+    r: linearmodels.typing.data.Float64Array
+    """Upper triangular factor (nvar by nvar)."""
+    g: linearmodels.typing.data.Float64Array | None
+    """Symmetric middle factor (nvar by nvar), or None if it is the identity."""
+    t: linearmodels.typing.data.Float64Array | None
+    """Transformed cross product with y (nvar by 1), or None without y."""
+    u: linearmodels.typing.data.Float64Array
+    """Coordinates of the projected regressors (ninstr by nvar)."""
+
+
+def kclass_factors(
+    x: linearmodels.typing.data.Float64Array,
+    z_basis: linearmodels.typing.data.Float64Array,
+    kappa: float,
+    y: linearmodels.typing.data.Float64Array | None = None,
+) -> KClassFactors:
+    r"""
+    Factor the cross products of the k-class estimator without forming them.
+
+    Parameters
+    ----------
+    x : ndarray
+        Regressors (nobs by nvar), with nvar >= 1.
+    z_basis : ndarray
+        Orthonormal basis of the instruments (nobs by ninstr), with ninstr >= nvar.
+        See :func:`orthonormal_basis`.
+    kappa : float
+        The parameter of the k-class estimator.
+    y : ndarray, optional
+        The dependent variable (nobs by 1). t is only computed if it is provided.
+
+    Returns
+    -------
+    KClassFactors
+        The factors R, G, t and U.
+
+    Notes
+    -----
+    Let :math:`X = Q_XR_X`, :math:`A = Q'X = Q_A R_A` and :math:`a = Q'y`.
+
+    * :math:`0 \le \kappa < 1`, which includes OLS: the cross products are
+      :math:`(1-\kappa)X'X + \kappa A'A`, those of the least squares problem with
+      regressors :math:`[\sqrt{1-\kappa}R_X; \sqrt{\kappa}A]` and dependent
+      variable :math:`[\sqrt{1-\kappa}Q_X'y; \sqrt{\kappa}a]`. R is the triangular
+      factor of these regressors, and G is the identity.
+    * Otherwise, which includes 2SLS and LIML: :math:`R = R_A`,
+      :math:`F = M_zXR^{-1}`, :math:`G = I - (\kappa - 1)F'F`,
+      :math:`t = Q_A'a - (\kappa - 1)F'M_zy` and :math:`U = Q_A`. With
+      :math:`\kappa = 1` (2SLS), G is the identity, and the estimate is the least
+      squares solution of the projected problem, as in R's ``ivreg``.
+
+    R is only used in triangular solves, so the condition number of the problem is
+    not squared, and the factors do not depend on the units of the variables.
+    """
+    if x.shape[1] == 0:
+        raise ValueError('method="qr" requires at least one regressor.')
+    qx = z_basis.T @ x
+    if 0 <= kappa < 1:
+        qx_y, r_x = _triangular_factor(x, y)
+        w0, w1 = float(np.sqrt(1 - kappa)), float(np.sqrt(kappa))
+        q_s, r = sp_qr(np.vstack([w0 * r_x, w1 * qx]), mode="economic")
+        t = None
+        if y is not None:
+            t = q_s.T @ np.concatenate([w0 * qx_y, w1 * (z_basis.T @ y)])
+        u = solve_triangular(r, qx.T, trans="T").T
+        return KClassFactors(r, None, t, u)
+
+    q_a, r = sp_qr(qx, mode="economic")
+    t = None if y is None else q_a.T @ (z_basis.T @ y)
+    g = None
+    if kappa != 1:
+        f = solve_triangular(r, (x - z_basis @ qx).T, trans="T").T
+        g = np.eye(x.shape[1]) - (kappa - 1) * (f.T @ f)
+        if y is not None and t is not None:
+            resid_y = y - z_basis @ (z_basis.T @ y)
+            t = t - (kappa - 1) * (f.T @ resid_y)
+    return KClassFactors(r, g, t, q_a)
+
+
+def _triangular_factor(
+    x: linearmodels.typing.data.Float64Array,
+    y: linearmodels.typing.data.Float64Array | None,
+) -> tuple[Any, linearmodels.typing.data.Float64Array]:
+    """Q'y and R of the Householder QR decomposition of x, without forming Q."""
+    if y is None:
+        return None, sp_qr(x, mode="raw", check_finite=False)[1]
+    qy, r = qr_multiply(x, y.reshape(y.shape[0], -1).T, mode="right")
+    return (qy[0] if y.ndim == 1 else qy.T), r
+
+
+def kclass_solve(factors: KClassFactors) -> linearmodels.typing.data.Float64Array:
+    """
+    The k-class estimate from the factors of its cross products.
+
+    Parameters
+    ----------
+    factors : KClassFactors
+        Factors computed with y, see :func:`kclass_factors`.
+
+    Returns
+    -------
+    ndarray
+        The estimate :math:`R^{-1}G^{-1}t` (nvar by 1).
+    """
+    t = cast("linearmodels.typing.data.Float64Array", factors.t)
+    if factors.g is not None:
+        t = np.linalg.solve(factors.g, t)
+    return solve_triangular(factors.r, t)
 
 
 class IVFormulaParser:
