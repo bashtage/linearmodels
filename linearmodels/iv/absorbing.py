@@ -1651,7 +1651,7 @@ class AbsorbingLS:
                 cov_estimator, cov_config.get("clusters")
             )
         cov_estimator_inst = cov_estimator(
-            exog_resid, dep_resid, exog_resid, params, **cov_config_copy
+            exog_resid, dep_resid, exog_resid, params, method="pinv", **cov_config_copy
         )
 
         results = {"kappa": 0.0, "liml_kappa": 0.0}

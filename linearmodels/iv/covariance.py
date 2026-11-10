@@ -10,7 +10,6 @@ from typing import Any, Literal, Union, cast
 from mypy_extensions import VarArg
 from numpy import (
     arange,
-    array_equal,
     asarray,
     ceil,
     cos,
@@ -27,11 +26,10 @@ from numpy import (
     zeros,
 )
 from numpy.linalg import inv, pinv
-from scipy.linalg import qr as sp_qr, solve_triangular
+from scipy.linalg import solve_triangular
 
 from linearmodels.iv._utility import (
     KClassFactors,
-    coordinates,
     kclass_factors,
     orthonormal_basis,
     resolve_method,
@@ -474,14 +472,10 @@ class HomoskedasticCovariance:
         It is only used if ``debiased`` is True, when n / (n-k) becomes
         n / (n-k-extra_df).
     method : {"pinv", "qr"}, optional
-        The numerical method. "pinv" projects with ``pinv(z)`` and inverts V. "qr"
-        projects with the QR decomposition of z and computes the inverse of V from
-        triangular factors, without forming V, so that the estimate does not depend on
-        the units of the variables and its rounding error grows with the condition
-        number of the regressors, not with its square. z must have full column rank with
-        "qr". IV2SLS and IVLIML use the numerical method of the model. If not provided,
-        "pinv" is used, and a ``FutureWarning`` says that the default will be "qr" in
-        linearmodels 8.0 if the caller is not part of linearmodels.
+        Numerical method, see :class:`~linearmodels.iv.model.IV2SLS`. With "qr", z
+        must have full column rank. If not given, "pinv" is used and a
+        ``FutureWarning`` is issued, since the default will be "qr" in linearmodels
+        8.0.
 
         .. versionadded:: 7.2
 
@@ -542,11 +536,11 @@ class HomoskedasticCovariance:
         self.eps = y - x @ params
         self._kappa = kappa
         self._numerical_method = resolve_method(method, type(self).__name__)
-        # Decompositions and products that are computed once, see _reuse
+        # Decompositions of z and products with it, computed when first used or given
+        # by the model, see _reuse
         self._pinvz: linearmodels.typing.data.Float64Array | None = None
         self._pinvz_x: linearmodels.typing.data.Float64Array | None = None
         self._xpz_pinvz_x: linearmodels.typing.data.Float64Array | None = None
-        self._v: linearmodels.typing.data.Float64Array | None = None
         self._z_basis: linearmodels.typing.data.Float64Array | None = None
         self._factors: KClassFactors | None = None
         nobs, nvar = x.shape
@@ -574,90 +568,63 @@ class HomoskedasticCovariance:
     def _reuse(
         self,
         *,
+        pinvz: linearmodels.typing.data.Float64Array | None = None,
+        pinvz_x: linearmodels.typing.data.Float64Array | None = None,
+        xpz_pinvz_x: linearmodels.typing.data.Float64Array | None = None,
         z_basis: linearmodels.typing.data.Float64Array | None = None,
         factors: KClassFactors | None = None,
-        products: dict[str, linearmodels.typing.data.Float64Array] | None = None,
     ) -> None:
         """
-        Use decompositions that the model computed from the same x, z and kappa.
+        Use what the model computed from the same x, z and kappa.
 
-        The results are the same as if they were computed here. products holds
-        pinv(z), pinv(z) @ x and (x'z) @ (pinv(z) @ x) of method="pinv" as
-        "pinvz", "pinvz_x" and "xpz_pinvz_x".
+        With method="pinv", pinv(z), pinv(z) @ x and x'z @ pinv(z) @ x. With "qr",
+        the orthonormal basis of z and the factors of the k-class estimator.
         """
-        if z_basis is not None:
-            self._z_basis = z_basis
-        if factors is not None:
-            self._factors = factors
-        products = {} if products is None else products
-        self._pinvz = products.get("pinvz", self._pinvz)
-        self._pinvz_x = products.get("pinvz_x", self._pinvz_x)
-        self._xpz_pinvz_x = products.get("xpz_pinvz_x", self._xpz_pinvz_x)
+        self._pinvz, self._pinvz_x, self._xpz_pinvz_x = pinvz, pinvz_x, xpz_pinvz_x
+        self._z_basis, self._factors = z_basis, factors
 
-    def _kclass_factors(self, with_u: bool = False) -> KClassFactors:
-        """Factors of the cross products of the k-class estimator, computed once."""
-        factors = self._factors
-        if factors is not None and (factors.u is not None or not with_u):
-            return factors
-        x, z = self.x, self.z
-        if factors is not None:
-            # Only U is missing (OLS), which needs the basis but no decomposition of x
-            u = coordinates(x, self._basis(), factors.r)
-            self._factors = KClassFactors(factors.r, factors.g, factors.t, u)
-            return self._factors
-        kappa = float(self._kappa)
-        if kappa == 0 and self._z_basis is None and array_equal(x, z):
-            # OLS, where z is x: the QR decomposition of x gives both
-            q, r = sp_qr(x, mode="economic", check_finite=False)
-            self._z_basis = q
-            self._factors = KClassFactors(r, None, None, eye(x.shape[1]))
-            return self._factors
-        z_basis = self._basis() if (with_u or kappa != 0) else None
-        self._factors = kclass_factors(x, z_basis, kappa)
-        return self._factors
-
-    def _basis(self) -> linearmodels.typing.data.Float64Array:
-        """Orthonormal basis of the instruments, computed once."""
-        if self._z_basis is None:
-            self._z_basis = orthonormal_basis(self.z)
-        return self._z_basis
-
-    def _pinv_of_z(self) -> linearmodels.typing.data.Float64Array:
-        """The pseudo-inverse of z of method="pinv", computed once."""
+    def _pinv_z(self) -> linearmodels.typing.data.Float64Array:
+        """pinv(z), used with method="pinv", computed once."""
         if self._pinvz is None:
             self._pinvz = pinv(self.z)
         return self._pinvz
 
-    def _pinv_product(self) -> linearmodels.typing.data.Float64Array:
-        """pinv(z) @ x of method="pinv", computed once."""
+    def _pinv_z_x(self) -> linearmodels.typing.data.Float64Array:
+        """pinv(z) @ x, used with method="pinv", computed once."""
         if self._pinvz_x is None:
-            self._pinvz_x = self._pinv_of_z() @ self.x
+            self._pinvz_x = self._pinv_z() @ self.x
         return self._pinvz_x
+
+    def _basis(self) -> linearmodels.typing.data.Float64Array:
+        """Orthonormal basis of the instruments, used with method="qr"."""
+        if self._z_basis is None:
+            self._z_basis = orthonormal_basis(self.z)
+        return self._z_basis
+
+    def _kclass_factors(self) -> KClassFactors:
+        """Factors of the cross products of the k-class estimator, computed once."""
+        if self._factors is None:
+            self._factors = kclass_factors(self.x, self._basis(), float(self._kappa))
+        return self._factors
 
     def _xhat(self) -> linearmodels.typing.data.Float64Array:
         """The projection of x on z, which are the regressors of the scores."""
         if self._numerical_method == "pinv":
-            return self.z @ self._pinv_product()
+            return self.z @ self._pinv_z_x()
         z_basis = self._basis()
         return z_basis @ (z_basis.T @ self.x)
 
     def _pinv_v(self) -> linearmodels.typing.data.Float64Array:
         """V of method="pinv", the k-class cross product of x divided by nobs."""
-        if self._v is not None:
-            return self._v
         x, z = self.x, self.z
         nobs = x.shape[0]
-        kappa = self._kappa
-        if kappa == 0:
-            # (1 - 0) x'x / n + 0 V is x'x / n exactly, for finite data
-            v = x.T @ x / nobs
-        else:
-            a = self._xpz_pinvz_x
-            v = ((x.T @ z) @ self._pinv_product() if a is None else a) / nobs
-            if kappa != 1:
-                xpx = x.T @ x / nobs
-                v = (1 - kappa) * xpx + kappa * v
-        self._v = v
+        if self._xpz_pinvz_x is None:
+            self._xpz_pinvz_x = (x.T @ z) @ self._pinv_z_x()
+        v = self._xpz_pinvz_x / nobs
+        if self._kappa != 1:
+            kappa = self._kappa
+            xpx = x.T @ x / nobs
+            v = (1 - kappa) * xpx + kappa * v
         return v
 
     def _rotated_scores(self) -> linearmodels.typing.data.Float64Array:
@@ -669,10 +636,7 @@ class HomoskedasticCovariance:
         columns are well conditioned, even if the columns of :math:`\hat{x}` are
         nearly collinear or on very different scales.
         """
-        u = cast(
-            "linearmodels.typing.data.Float64Array",
-            self._kclass_factors(with_u=True).u,
-        )
+        u = self._kclass_factors().u
         return asarray((self._basis() @ u) * self.eps, dtype=float)
 
     def _rotated_s(self) -> linearmodels.typing.data.Float64Array:
@@ -712,10 +676,6 @@ class HomoskedasticCovariance:
             vinv = inv(self._pinv_v())
             c = vinv @ self.s @ vinv / nobs
             return (c + c.T) / 2
-        if nvar == 0:
-            # No regressors, as with "pinv". The triangular solves of the coordinates
-            # of OLS use trans="T", which fails with empty arrays in SciPy 2.0.dev
-            return empty((0, 0))
         factors = self._kclass_factors()
         # V = R'GR / n, so that V^-1 S V^-1 / n = n R^-1 G^-1 (R^-T S R^-1) G^-1 R^-T.
         # R is only used in triangular solves, so that the condition number of the
@@ -770,14 +730,10 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
         It is only used if ``debiased`` is True, when n / (n-k) becomes
         n / (n-k-extra_df).
     method : {"pinv", "qr"}, optional
-        The numerical method. "pinv" projects with ``pinv(z)`` and inverts V. "qr"
-        projects with the QR decomposition of z and computes the inverse of V from
-        triangular factors, without forming V, so that the estimate does not depend on
-        the units of the variables and its rounding error grows with the condition
-        number of the regressors, not with its square. z must have full column rank with
-        "qr". IV2SLS and IVLIML use the numerical method of the model. If not provided,
-        "pinv" is used, and a ``FutureWarning`` says that the default will be "qr" in
-        linearmodels 8.0 if the caller is not part of linearmodels.
+        Numerical method, see :class:`~linearmodels.iv.model.IV2SLS`. With "qr", z
+        must have full column rank. If not given, "pinv" is used and a
+        ``FutureWarning`` is issued, since the default will be "qr" in linearmodels
+        8.0.
 
         .. versionadded:: 7.2
 
@@ -827,7 +783,6 @@ class HeteroskedasticCovariance(HomoskedasticCovariance):
         *,
         method: Literal["pinv", "qr"] | None = None,
     ):
-        method = resolve_method(method, type(self).__name__)
         super().__init__(x, y, z, params, debiased, kappa, extra_df, method=method)
         self._name = "Robust Covariance (Heteroskedastic)"
 
@@ -886,14 +841,10 @@ class KernelCovariance(HomoskedasticCovariance):
         It is only used if ``debiased`` is True, when n / (n-k) becomes
         n / (n-k-extra_df).
     method : {"pinv", "qr"}, optional
-        The numerical method. "pinv" projects with ``pinv(z)`` and inverts V. "qr"
-        projects with the QR decomposition of z and computes the inverse of V from
-        triangular factors, without forming V, so that the estimate does not depend on
-        the units of the variables and its rounding error grows with the condition
-        number of the regressors, not with its square. z must have full column rank with
-        "qr". IV2SLS and IVLIML use the numerical method of the model. If not provided,
-        "pinv" is used, and a ``FutureWarning`` says that the default will be "qr" in
-        linearmodels 8.0 if the caller is not part of linearmodels.
+        Numerical method, see :class:`~linearmodels.iv.model.IV2SLS`. With "qr", z
+        must have full column rank. If not given, "pinv" is used and a
+        ``FutureWarning`` is issued, since the default will be "qr" in linearmodels
+        8.0.
 
         .. versionadded:: 7.2
 
@@ -974,7 +925,6 @@ class KernelCovariance(HomoskedasticCovariance):
         *,
         method: Literal["pinv", "qr"] | None = None,
     ):
-        method = resolve_method(method, type(self).__name__)
         super().__init__(x, y, z, params, debiased, kappa, extra_df, method=method)
         self._kernels = KERNEL_LOOKUP
         kernel = lower_option(kernel)
@@ -1011,19 +961,17 @@ class KernelCovariance(HomoskedasticCovariance):
         """
         The kernel estimate of the covariance of the scores.
 
-        xhat is given if the scores are in the units of x, xhat * eps.
+        The automatic bandwidth is selected from xhat * eps, the scores in the units
+        of x, whatever the coordinates of scores. xhat, the projection of x on z, is
+        computed if it is not given.
         """
         nobs = self.x.shape[0]
         kernel = self.config["kernel"]
         bw = self.config["bandwidth"]
         if bw is None:
             self._auto_bandwidth = True
-            # The bandwidth is selected from the scores in the units of x
-            if xhat is None:
-                xhat = self._xhat()
-                xhat_e = asarray(xhat * self.eps, dtype=float)
-            else:
-                xhat_e = scores
+            xhat = self._xhat() if xhat is None else xhat
+            xhat_e = asarray(xhat * self.eps, dtype=float)
             const, loc = has_constant(xhat)
             sel = ones((xhat.shape[1], 1))
             if const and xhat.shape[1] > 1:
@@ -1076,14 +1024,10 @@ class ClusteredCovariance(HomoskedasticCovariance):
         It is only used if ``debiased`` is True, when n / (n-k) becomes
         n / (n-k-extra_df).
     method : {"pinv", "qr"}, optional
-        The numerical method. "pinv" projects with ``pinv(z)`` and inverts V. "qr"
-        projects with the QR decomposition of z and computes the inverse of V from
-        triangular factors, without forming V, so that the estimate does not depend on
-        the units of the variables and its rounding error grows with the condition
-        number of the regressors, not with its square. z must have full column rank with
-        "qr". IV2SLS and IVLIML use the numerical method of the model. If not provided,
-        "pinv" is used, and a ``FutureWarning`` says that the default will be "qr" in
-        linearmodels 8.0 if the caller is not part of linearmodels.
+        Numerical method, see :class:`~linearmodels.iv.model.IV2SLS`. With "qr", z
+        must have full column rank. If not given, "pinv" is used and a
+        ``FutureWarning`` is issued, since the default will be "qr" in linearmodels
+        8.0.
 
         .. versionadded:: 7.2
 
@@ -1137,7 +1081,6 @@ class ClusteredCovariance(HomoskedasticCovariance):
         *,
         method: Literal["pinv", "qr"] | None = None,
     ):
-        method = resolve_method(method, type(self).__name__)
         super().__init__(x, y, z, params, debiased, kappa, extra_df, method=method)
 
         nobs = x.shape[0]

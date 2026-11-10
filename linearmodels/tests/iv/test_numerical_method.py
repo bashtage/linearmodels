@@ -31,6 +31,7 @@ about 2.4 / delta.
 
 from fractions import Fraction
 import inspect
+import re
 import warnings
 
 import numpy as np
@@ -54,7 +55,6 @@ from linearmodels.iv.covariance import (
     HomoskedasticCovariance,
     KernelCovariance,
 )
-from linearmodels.iv.model import _rank_and_condition_number
 from linearmodels.iv.results import FirstStageResults
 
 NOBS = 64
@@ -205,11 +205,6 @@ def test_nearly_collinear_regressors():
         IV2SLS(*data, method="qr")
     with pytest.raises(ValueError, match=r"regressors .* collinear"):
         IVLIML(*data, method="qr")
-    # The warning of the default also says that method="qr" raises for these data
-    with pytest.warns(FutureWarning, match="regressors .* nearly collinear"):
-        IV2SLS(*data)
-    with pytest.warns(FutureWarning, match='method="qr" raises a ValueError'):
-        IVLIML(*data)
     with warnings.catch_warnings():
         warnings.simplefilter("error")
         IV2SLS(*data, method="pinv")
@@ -235,8 +230,7 @@ def test_nearly_collinear_instruments():
     instr[:, 1] = instr[:, 0] + 2.0**-33 * hadamard(NOBS)[:, 7]
     with pytest.raises(ValueError, match=r"instruments .* collinear"):
         IV2SLS(y, exog, endog, instr, method="qr")
-    with pytest.warns(FutureWarning, match="instruments .* nearly collinear"):
-        IV2SLS(y, exog, endog, instr)
+    IV2SLS(y, exog, endog, instr, method="pinv")
 
 
 def test_exactly_collinear_or_zero_columns_are_rank_deficient():
@@ -284,7 +278,7 @@ def test_unscaled_rank_check_depends_on_the_units():
 def test_default_is_pinv():
     data = scaled_data()
     for model in (IV2SLS, IVLIML):
-        with pytest.warns(FutureWarning, match="default numerical method"):
+        with pytest.warns(FutureWarning, match="The default method of"):
             default = model(*data).fit(cov_type="robust")
         pinv = model(*data, method="pinv").fit(cov_type="robust")
         assert_allclose(default.params, pinv.params, rtol=1e-14)
@@ -345,6 +339,7 @@ MODELS = {
     "liml": (IVLIML, {}),
     "fuller": (IVLIML, {"fuller": 4.0}),
     "kappa-0.5": (IVLIML, {"kappa": 0.5}),
+    "negative-kappa": (IVLIML, {"kappa": -0.5}),
 }
 
 
@@ -468,7 +463,7 @@ def test_kappa_with_two_endogenous_regressors_does_not_depend_on_the_units(scale
 # ----------------------------------------------------------------------------
 
 
-@pytest.mark.parametrize("kappa", [0.0, 0.4, 1.0, 1.25])
+@pytest.mark.parametrize("kappa", [-0.5, 0.0, 0.4, 1.0, 1.25])
 def test_kclass_factors(kappa):
     y, exog, endog, instr = scaled_data()
     x = np.c_[exog, endog]
@@ -488,7 +483,7 @@ def test_kclass_factors(kappa):
     assert_allclose(np.triu(factors.r), factors.r, rtol=0, atol=0)
 
 
-@pytest.mark.parametrize("kappa", [0.0, 0.5, 1.0, 1.1])
+@pytest.mark.parametrize("kappa", [-0.5, 0.0, 0.5, 1.0, 1.1])
 @pytest.mark.parametrize(
     ("estimator", "options"),
     [
@@ -516,18 +511,15 @@ def test_covariance_estimators_agree(estimator, options, kappa, ninstr):
     assert_allclose(params_qr, params, rtol=1e-10)
 
 
-def test_kclass_factors_of_ols_do_not_need_the_instruments():
+@pytest.mark.parametrize("kappa", [-0.5, 0.0, 0.5, 1.0, 1.1])
+def test_estimate_parameters_with_one_dimensional_y(kappa):
     y, exog, endog, instr = scaled_data()
     x = np.c_[exog, endog]
     z = np.c_[exog, instr]
-    y = y[:, None]
-    with_basis = kclass_factors(x, orthonormal_basis(z), 0.0, y)
-    without = kclass_factors(x, None, 0.0, y)
-    assert without.u is None
-    assert_allclose(without.r, with_basis.r, rtol=1e-14)
-    assert_allclose(without.t, with_basis.t, rtol=1e-14)
-    with pytest.raises(ValueError, match="z_basis is required"):
-        kclass_factors(x, None, 0.5, y)
+    expected = IVLIML.estimate_parameters(x, y, z, kappa, method="pinv")
+    actual = IVLIML.estimate_parameters(x, y, z, kappa, method="qr")
+    assert actual.shape == expected.shape == (5,)
+    assert_allclose(actual, expected, rtol=1e-10)
 
 
 @pytest.mark.parametrize(
@@ -540,7 +532,7 @@ def test_kclass_factors_of_ols_do_not_need_the_instruments():
     ],
 )
 def test_ols_covariance_with_z_equal_to_x(estimator, options):
-    # z is x in OLS, and one QR decomposition of x is used for both
+    # z is x in OLS
     y, exog, endog, _ = scaled_data()
     x = np.c_[exog, endog]
     y = y[:, None]
@@ -562,18 +554,22 @@ COVARIANCE_ESTIMATORS = {
 @pytest.mark.parametrize("kappa", [0.0, 0.5, 1.0, 1.5])
 @pytest.mark.parametrize("estimator", list(COVARIANCE_ESTIMATORS))
 def test_no_regressors(estimator, kappa):
-    # The models need a regressor, but estimate_parameters and the covariance
-    # estimators accept none, and both methods return empty arrays
+    # The models need a regressor. Without one, estimate_parameters and the covariance
+    # estimators return empty arrays with "pinv", and raise with "qr"
     estimator, options = COVARIANCE_ESTIMATORS[estimator]
     y, _, _, instr = scaled_data()
     x = np.empty((y.shape[0], 0))
     y = y[:, None]
-    for method in ("pinv", "qr"):
-        params = IVLIML.estimate_parameters(x, y, instr, kappa, method=method)
-        assert params.shape == (0, 1)
-        cov = estimator(x, y, instr, params, kappa=kappa, method=method, **options)
-        assert cov.cov.shape == (0, 0)
-        assert cov.s.shape == (0, 0)
+    params = IVLIML.estimate_parameters(x, y, instr, kappa, method="pinv")
+    assert params.shape == (0, 1)
+    cov = estimator(x, y, instr, params, kappa=kappa, method="pinv", **options)
+    assert cov.cov.shape == (0, 0)
+    assert cov.s.shape == (0, 0)
+    with pytest.raises(ValueError, match="at least one regressor"):
+        IVLIML.estimate_parameters(x, y, instr, kappa, method="qr")
+    cov = estimator(x, y, instr, params, kappa=kappa, method="qr", **options)
+    with pytest.raises(ValueError, match="at least one regressor"):
+        _ = cov.cov
 
 
 def rank_deficient_exog_data():
@@ -630,36 +626,6 @@ def test_projections_agree(shape):
         assert_allclose(proj(y, x, method="qr"), y, rtol=1e-12)
 
 
-@pytest.mark.parametrize("scale", [1.0, 2.0**30, 2.0**-40])
-def test_rank_and_condition_number(scale):
-    _, exog, endog, _ = scaled_data()
-    x = np.c_[exog, endog * np.array([1, scale])]
-    rank, cond = _rank_and_condition_number(x)
-    assert rank == np.linalg.matrix_rank(x)
-    assert_allclose(cond, np.linalg.cond(x), rtol=1e-8)
-    deficient = np.c_[x, x[:, 1] + x[:, 2]]
-    assert _rank_and_condition_number(deficient)[0] == np.linalg.matrix_rank(deficient)
-    assert _rank_and_condition_number(x[:3])[1] == np.inf
-
-
-def test_no_collinearity_note_for_columns_on_different_scales():
-    # The condition number is about 1e9, from the units only. The columns scaled to
-    # unit length are well conditioned, so that the warning has no note
-    y, exog, endog, instr = scaled_data()
-    with pytest.warns(FutureWarning, match="default numerical method") as record:
-        res = IV2SLS(y, exog * np.array([1, 2.0**30, 1]), endog, instr).fit()
-    assert len(record) == 1
-    assert "nearly collinear" not in str(record[0].message)
-    expected = IV2SLS(y, exog, endog, instr, method="qr").fit()
-    assert_allclose(res.params.iloc[1] * 2.0**30, expected.params.iloc[1], rtol=1e-6)
-
-
-DEFAULT_WARNING = (
-    'The default numerical method of IV2SLS and IVLIML will change from "pinv" to '
-    '"qr" in linearmodels 8.0.'
-)
-
-
 @pytest.mark.parametrize(
     "create",
     [
@@ -691,13 +657,14 @@ def test_the_default_warns_of_the_change_in_8(create):
         create(data)
     assert len(record) == 1
     message = str(record[0].message)
-    assert message.startswith(DEFAULT_WARNING)
-    # How to get the new method now and how to keep the current one
-    assert 'Use method="qr" to use it now' in message
-    assert (
-        'method="pinv" to keep the current method and silence this warning' in message
+    assert re.match(
+        r'The default method of IV(2SLS|LIML) will change from "pinv" to "qr" in '
+        r"linearmodels 8\.0\.",
+        message,
     )
-    assert "nearly collinear" not in message
+    # How to get the new method now and how to keep the current one
+    assert 'Pass method="qr" to use the new method now' in message
+    assert 'method="pinv" to keep the current one and silence this warning' in message
     # The warning points at the caller
     assert record[0].filename == __file__
 
@@ -768,7 +735,7 @@ def test_lower_level_functions_warn_if_called_directly(name):
         call()
     assert len(record) == 1
     message = str(record[0].message)
-    assert message.startswith(f"The default numerical method of {name} will change")
+    assert message.startswith(f"The default method of {name} will change")
     assert 'method="qr"' in message
     assert 'method="pinv"' in message
     assert record[0].filename == __file__
@@ -778,7 +745,7 @@ def test_lower_level_functions_warn_if_called_directly(name):
 def test_lower_level_functions_do_not_warn_inside_linearmodels(cov_type):
     # The models create the covariance estimators, the first stage results and the
     # rank tests with their own method. AbsorbingLS and IVGMM create IV covariance
-    # estimators without a method
+    # estimators with method="pinv"
     y, exog, endog, instr = scaled_data()
     cov_options = dict(COV_OPTIONS[cov_type])
     if cov_type == "clustered":

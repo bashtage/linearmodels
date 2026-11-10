@@ -827,10 +827,9 @@ class FirstStageResults(_SummaryStr):
     cov_config : dict
         Options of the covariance estimator of the model.
     method : {"pinv", "qr"}, optional
-        The numerical method of the model, which is used for the first stage
-        regressions. If not provided, "pinv" is used, and a ``FutureWarning`` says
-        that the default will be "qr" in linearmodels 8.0 if the caller is not part
-        of linearmodels.
+        Numerical method of the first stage regressions and tests. If not given,
+        "pinv" is used and a ``FutureWarning`` is issued, since the default will be
+        "qr" in linearmodels 8.0.
 
         .. versionadded:: 7.2
     """

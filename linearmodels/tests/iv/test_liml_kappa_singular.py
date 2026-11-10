@@ -310,7 +310,7 @@ def previous_kappa(model):
 
 
 def current_kappa(model):
-    return model._estimate_kappa()
+    return model._estimate_kappa()[0]
 
 
 def kappa_or_none(function, model):

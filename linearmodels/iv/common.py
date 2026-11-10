@@ -106,7 +106,12 @@ class _FirstStageRank(NamedTuple):
 def _rank(
     a: linearmodels.typing.data.Float64Array, *, method: Literal["pinv", "qr"]
 ) -> int:
-    """The rank of a, of its columns scaled to unit length if method is "qr"."""
+    """
+    The rank of a, of its columns scaled to unit length if method is "qr".
+
+    Both use the tolerance of matrix_rank, as pinv does. The models use 1e-9 with
+    "qr", for the accuracy of the estimates, which these tests do not compute.
+    """
     if method == "qr":
         scale = norm(a, axis=0)
         scale[scale == 0] = 1.0
@@ -215,15 +220,10 @@ def cragg_donald(
         before testing. Include a constant column here if the model has one.
 
     method : {"pinv", "qr"}, optional
-        The numerical method. "pinv" partials out exog with
-        ``pinv`` and tests whether the partialled regressors and instruments are
-        collinear from their columns as they are. "qr" partials out exog with the
-        columns scaled to unit length and tests their rank after scaling the
-        columns to unit length, so that the statistic does not depend on the units
-        of the variables. The first stage results of IV2SLS and IVLIML use the
-        numerical method of the model. If not provided, "pinv" is used, and a
-        ``FutureWarning`` says that the default will be "qr" in linearmodels 8.0 if
-        the caller is not part of linearmodels.
+        Numerical method of partialling out exog and of the rank tests. "qr" scales
+        the columns to unit length, so the statistic does not depend on the units of
+        the variables. If not given, "pinv" is used and a ``FutureWarning`` is
+        issued, since the default will be "qr" in linearmodels 8.0.
 
         .. versionadded:: 7.2
 
@@ -354,15 +354,10 @@ def cragg_donald_f(
         before testing. Include a constant column here if the model has one.
 
     method : {"pinv", "qr"}, optional
-        The numerical method. "pinv" partials out exog with
-        ``pinv`` and tests whether the partialled regressors and instruments are
-        collinear from their columns as they are. "qr" partials out exog with the
-        columns scaled to unit length and tests their rank after scaling the
-        columns to unit length, so that the statistic does not depend on the units
-        of the variables. The first stage results of IV2SLS and IVLIML use the
-        numerical method of the model. If not provided, "pinv" is used, and a
-        ``FutureWarning`` says that the default will be "qr" in linearmodels 8.0 if
-        the caller is not part of linearmodels.
+        Numerical method of partialling out exog and of the rank tests. "qr" scales
+        the columns to unit length, so the statistic does not depend on the units of
+        the variables. If not given, "pinv" is used and a ``FutureWarning`` is
+        issued, since the default will be "qr" in linearmodels 8.0.
 
         .. versionadded:: 7.2
 
@@ -614,15 +609,10 @@ def kleibergen_paap(
         lists the supported kernels.
 
     method : {"pinv", "qr"}, optional
-        The numerical method. "pinv" partials out exog with
-        ``pinv`` and tests whether the partialled regressors and instruments are
-        collinear from their columns as they are. "qr" partials out exog with the
-        columns scaled to unit length and tests their rank after scaling the
-        columns to unit length, so that the statistic does not depend on the units
-        of the variables. The first stage results of IV2SLS and IVLIML use the
-        numerical method of the model. If not provided, "pinv" is used, and a
-        ``FutureWarning`` says that the default will be "qr" in linearmodels 8.0 if
-        the caller is not part of linearmodels.
+        Numerical method of partialling out exog and of the rank tests. "qr" scales
+        the columns to unit length, so the statistic does not depend on the units of
+        the variables. If not given, "pinv" is used and a ``FutureWarning`` is
+        issued, since the default will be "qr" in linearmodels 8.0.
 
         .. versionadded:: 7.2
 
@@ -793,15 +783,10 @@ def kleibergen_paap_f(
         Options for the covariance estimator. See :func:`kleibergen_paap`.
 
     method : {"pinv", "qr"}, optional
-        The numerical method. "pinv" partials out exog with
-        ``pinv`` and tests whether the partialled regressors and instruments are
-        collinear from their columns as they are. "qr" partials out exog with the
-        columns scaled to unit length and tests their rank after scaling the
-        columns to unit length, so that the statistic does not depend on the units
-        of the variables. The first stage results of IV2SLS and IVLIML use the
-        numerical method of the model. If not provided, "pinv" is used, and a
-        ``FutureWarning`` says that the default will be "qr" in linearmodels 8.0 if
-        the caller is not part of linearmodels.
+        Numerical method of partialling out exog and of the rank tests. "qr" scales
+        the columns to unit length, so the statistic does not depend on the units of
+        the variables. If not given, "pinv" is used and a ``FutureWarning`` is
+        issued, since the default will be "qr" in linearmodels 8.0.
 
         .. versionadded:: 7.2
 

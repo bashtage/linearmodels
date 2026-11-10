@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 import os
 import sys
+from types import FrameType
 from typing import Any, Literal, NamedTuple, cast
 import warnings
 
@@ -31,40 +32,45 @@ The original error was:
 
 METHODS = ("pinv", "qr")
 
-# The directory of the linearmodels package, and of its tests, which call the functions
-# as a user does
-_PACKAGE_DIRECTORY = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-_TESTS_DIRECTORY = os.path.join(_PACKAGE_DIRECTORY, "tests")
-
 FUTURE_DEFAULT_WARNING = (
-    'The default numerical method of {name} will change from "pinv" to "qr" in '
-    'linearmodels 8.0. Use method="qr" to use it now, or method="pinv" to keep the '
-    "current method and silence this warning."
+    'The default method of {name} will change from "pinv" to "qr" in linearmodels '
+    '8.0. Pass method="qr" to use the new method now, or method="pinv" to keep the '
+    "current one and silence this warning."
 )
 
-
-def _called_from_linearmodels(filename: str) -> bool:
-    """Whether code in filename is part of linearmodels, other than its tests."""
-    path = os.path.abspath(filename)
-    in_package = path.startswith(_PACKAGE_DIRECTORY + os.sep)
-    return in_package and not path.startswith(_TESTS_DIRECTORY + os.sep)
+_IV_DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 
 
-def resolve_method(method: Literal["pinv", "qr"] | None, name: str) -> str:
+def _external_stacklevel() -> int:
+    """The stacklevel, seen from the caller, of the first frame outside iv/."""
+    frame: FrameType | None = sys._getframe(1)
+    level = 1
+    while (
+        frame is not None
+        and os.path.dirname(os.path.abspath(frame.f_code.co_filename)) == _IV_DIRECTORY
+    ):
+        frame = frame.f_back
+        level += 1
+    return level
+
+
+def resolve_method(
+    method: Literal["pinv", "qr"] | None, name: str
+) -> Literal["pinv", "qr"]:
     """
-    Validate method of a function that is mostly used inside linearmodels.
+    Validate the method keyword, and warn if it is not given.
 
     Parameters
     ----------
     method : {"pinv", "qr"}, optional
-        The numerical method, "pinv" or "qr", not case sensitive.
+        The numerical method, not case sensitive.
     name : str
-        The name of the function or class, which is used in the warning.
+        The name of the class or function, used in the warning.
 
     Returns
     -------
-    str
-        The method in lower case. "pinv" if method is None.
+    {"pinv", "qr"}
+        The method in lower case, "pinv" if method is None.
 
     Raises
     ------
@@ -74,20 +80,16 @@ def resolve_method(method: Literal["pinv", "qr"] | None, name: str) -> str:
     Warns
     -----
     FutureWarning
-        If method is None and the caller of the function that calls this one is not
-        part of linearmodels, since the default changes to "qr" in linearmodels 8.0.
-        linearmodels passes the method of the model, and does not warn.
+        If method is None, since the default becomes "qr" in linearmodels 8.0. Code
+        inside linearmodels always passes method.
     """
     if method is None:
-        caller = sys._getframe(2)
-        if not _called_from_linearmodels(caller.f_code.co_filename):
-            warnings.warn(
-                FUTURE_DEFAULT_WARNING.format(name=name), FutureWarning, stacklevel=3
-            )
+        message = FUTURE_DEFAULT_WARNING.format(name=name)
+        warnings.warn(message, FutureWarning, stacklevel=_external_stacklevel())
         return "pinv"
     if not isinstance(method, str) or method.lower() not in METHODS:
         raise ValueError(f'method must be "pinv", "qr" or None, but it is {method!r}.')
-    return method.lower()
+    return cast('Literal["pinv", "qr"]', method.lower())
 
 
 def proj(
@@ -115,13 +117,11 @@ def proj(
 
     Notes
     -----
-    "pinv" projects with ``pinv(x)``, which drops the singular values of x that
-    are smaller than the largest one times max(nobs, nvar) times the machine
-    precision, so that directions are lost if the columns of x are on very
-    different scales. "qr" projects on the left singular vectors of x with columns
-    scaled to unit length, with the same cutoff, so that the result does not depend
-    on the units of the columns of x. Both are the projection on the column space
-    of x if x is rank deficient.
+    Both methods drop the directions of x whose singular values are below
+    max(nobs, nvar) * eps times the largest. "pinv" uses the columns of x as they
+    are, so it can drop a column that is on a much smaller scale than the others.
+    "qr" scales the columns to unit length first, so it does not depend on their
+    units.
     """
     if x.shape[1] == 0:
         return np.zeros_like(y)
@@ -129,19 +129,14 @@ def proj(
         return x @ (np.linalg.pinv(x) @ y)
     scale = np.linalg.norm(x, axis=0)
     scale[scale == 0] = 1.0
-    cutoff = max(x.shape) * np.finfo(float).eps
-    # The QR decomposition is the projection if no singular value is cut off, and it
-    # is cheaper than the SVD. sv(R) are the singular values of x / scale, and Q is
-    # square if x has fewer rows than columns
     q, r = sp_qr(x / scale, mode="economic", overwrite_a=True, check_finite=False)
-    sv = np.linalg.svd(r, compute_uv=False)
-    if sv[-1] > sv[0] * cutoff:
-        return q @ (q.T @ y)
-    # x is rank deficient, e.g., a constant and a full set of dummies, and the
-    # projection is on the left singular vectors that are not cut off, as with pinv
-    u, sv, _ = np.linalg.svd(x / scale, full_matrices=False)
-    u = u[:, sv > sv[0] * cutoff]
-    return u @ (u.T @ y)
+    u, sv, _ = np.linalg.svd(r)
+    keep = sv > sv[0] * max(x.shape) * np.finfo(float).eps
+    if not keep.all():
+        # Rank deficient, e.g., a constant and a full set of dummies. x / scale = QR,
+        # so Q @ u are its left singular vectors
+        q = q @ u[:, keep]
+    return q @ (q.T @ y)
 
 
 def annihilate(
@@ -223,15 +218,6 @@ def orthonormal_basis(
     -------
     ndarray
         The nobs by nvar factor Q of the Householder QR decomposition of x.
-
-    Notes
-    -----
-    Householder QR does not depend on the scale of the columns of x, and the
-    rounding error of a projection :math:`QQ'y` grows with the condition number of
-    x, not with its square. A projection with ``pinv`` drops the singular values
-    that are smaller than the largest one times max(nobs, nvar) times the machine
-    precision, so that it loses directions if the columns of x are on very
-    different scales.
     """
     return sp_qr(x, mode="economic", check_finite=False)[0]
 
@@ -258,13 +244,13 @@ class KClassFactors(NamedTuple):
     """Symmetric middle factor (nvar by nvar), or None if it is the identity."""
     t: linearmodels.typing.data.Float64Array | None
     """Transformed cross product with y (nvar by 1), or None without y."""
-    u: linearmodels.typing.data.Float64Array | None
-    """Coordinates of the projected regressors (ninstr by nvar), or None."""
+    u: linearmodels.typing.data.Float64Array
+    """Coordinates of the projected regressors (ninstr by nvar)."""
 
 
 def kclass_factors(
     x: linearmodels.typing.data.Float64Array,
-    z_basis: linearmodels.typing.data.Float64Array | None,
+    z_basis: linearmodels.typing.data.Float64Array,
     kappa: float,
     y: linearmodels.typing.data.Float64Array | None = None,
 ) -> KClassFactors:
@@ -274,11 +260,10 @@ def kclass_factors(
     Parameters
     ----------
     x : ndarray
-        Regressors (nobs by nvar).
-    z_basis : ndarray or None
+        Regressors (nobs by nvar), with nvar >= 1.
+    z_basis : ndarray
         Orthonormal basis of the instruments (nobs by ninstr), with ninstr >= nvar.
-        See :func:`orthonormal_basis`. It can be None if kappa is 0, and U is then
-        None.
+        See :func:`orthonormal_basis`.
     kappa : float
         The parameter of the k-class estimator.
     y : ndarray, optional
@@ -291,48 +276,32 @@ def kclass_factors(
 
     Notes
     -----
-    Let :math:`A = Q'X = Q_A R_A` and :math:`a = Q'y`.
+    Let :math:`X = Q_XR_X`, :math:`A = Q'X = Q_A R_A` and :math:`a = Q'y`.
 
-    * :math:`\kappa = 1` (2SLS): :math:`R = R_A`, G is the identity, :math:`t =
-      Q_A'a` and :math:`U = Q_A`. The estimate is the least squares solution of
-      the projected problem, as in a 2SLS by QR.
-    * :math:`\kappa < 1`: the cross products are :math:`(1-\kappa)X'X +
-      \kappa A'A`, which are those of the least squares problem with the stacked
+    * :math:`0 \le \kappa < 1`, which includes OLS: the cross products are
+      :math:`(1-\kappa)X'X + \kappa A'A`, those of the least squares problem with
       regressors :math:`[\sqrt{1-\kappa}R_X; \sqrt{\kappa}A]` and dependent
-      variable :math:`[\sqrt{1-\kappa}Q_X'y; \sqrt{\kappa}a]`, where :math:`X =
-      Q_XR_X`. R is the triangular factor of the stacked regressors, which is
-      :math:`R_X` if :math:`\kappa = 0` (OLS), and G is the identity.
-    * :math:`\kappa > 1` (LIML): :math:`R = R_A`, :math:`F = M_zXR^{-1}`,
-      :math:`G = I - (\kappa - 1)F'F`, :math:`t = Q_A'a - (\kappa - 1)F'M_zy` and
-      :math:`U = Q_A`.
+      variable :math:`[\sqrt{1-\kappa}Q_X'y; \sqrt{\kappa}a]`. R is the triangular
+      factor of these regressors, and G is the identity.
+    * Otherwise, which includes 2SLS and LIML: :math:`R = R_A`,
+      :math:`F = M_zXR^{-1}`, :math:`G = I - (\kappa - 1)F'F`,
+      :math:`t = Q_A'a - (\kappa - 1)F'M_zy` and :math:`U = Q_A`. With
+      :math:`\kappa = 1` (2SLS), G is the identity, and the estimate is the least
+      squares solution of the projected problem, as in R's ``ivreg``.
 
-    R is only used in triangular solves, so that the condition number of the
-    problem is not squared, and the factors do not depend on the units of the
-    columns of X, y or the instruments.
+    R is only used in triangular solves, so the condition number of the problem is
+    not squared, and the factors do not depend on the units of the variables.
     """
-    nvar = x.shape[1]
-    if nvar == 0:
-        # No regressors, which the covariance estimators accept. qr_multiply fails if
-        # x has no columns
-        t0 = None if y is None else np.empty((0,) + y.shape[1:])
-        u0 = None if z_basis is None else np.empty((z_basis.shape[1], 0))
-        return KClassFactors(np.empty((0, 0)), None, t0, u0)
-    if kappa == 0:
-        # R_X and Q_X'y, applying the Householder reflections to y without forming
-        # Q_X
-        qx_y, r_x = _triangular_factor(x, y)
-        u = None if z_basis is None else coordinates(x, z_basis, r_x)
-        return KClassFactors(r_x, None, qx_y, u)
-    if z_basis is None:
-        raise ValueError("z_basis is required if kappa is not 0.")
+    if x.shape[1] == 0:
+        raise ValueError('method="qr" requires at least one regressor.')
     qx = z_basis.T @ x
-    if kappa < 1:
+    if 0 <= kappa < 1:
         qx_y, r_x = _triangular_factor(x, y)
         w0, w1 = float(np.sqrt(1 - kappa)), float(np.sqrt(kappa))
         q_s, r = sp_qr(np.vstack([w0 * r_x, w1 * qx]), mode="economic")
         t = None
-        if y is not None and qx_y is not None:
-            t = q_s.T @ np.vstack([w0 * qx_y, w1 * (z_basis.T @ y)])
+        if y is not None:
+            t = q_s.T @ np.concatenate([w0 * qx_y, w1 * (z_basis.T @ y)])
         u = solve_triangular(r, qx.T, trans="T").T
         return KClassFactors(r, None, t, u)
 
@@ -340,10 +309,9 @@ def kclass_factors(
     t = None if y is None else q_a.T @ (z_basis.T @ y)
     g = None
     if kappa != 1:
-        resid_x = x - z_basis @ qx
-        f = solve_triangular(r, resid_x.T, trans="T").T
-        g = np.eye(nvar) - (kappa - 1) * (f.T @ f)
-        if t is not None and y is not None:
+        f = solve_triangular(r, (x - z_basis @ qx).T, trans="T").T
+        g = np.eye(x.shape[1]) - (kappa - 1) * (f.T @ f)
+        if y is not None and t is not None:
             resid_y = y - z_basis @ (z_basis.T @ y)
             t = t - (kappa - 1) * (f.T @ resid_y)
     return KClassFactors(r, g, t, q_a)
@@ -352,41 +320,12 @@ def kclass_factors(
 def _triangular_factor(
     x: linearmodels.typing.data.Float64Array,
     y: linearmodels.typing.data.Float64Array | None,
-) -> tuple[
-    linearmodels.typing.data.Float64Array | None, linearmodels.typing.data.Float64Array
-]:
+) -> tuple[Any, linearmodels.typing.data.Float64Array]:
     """Q'y and R of the Householder QR decomposition of x, without forming Q."""
     if y is None:
         return None, sp_qr(x, mode="raw", check_finite=False)[1]
-    y2 = y.reshape(y.shape[0], -1)
-    qy, r = qr_multiply(x, y2.T, mode="right")
-    qy = qy.T
-    return (qy[:, 0] if y.ndim == 1 else qy), r
-
-
-def coordinates(
-    x: linearmodels.typing.data.Float64Array,
-    z_basis: linearmodels.typing.data.Float64Array,
-    r: linearmodels.typing.data.Float64Array,
-) -> linearmodels.typing.data.Float64Array:
-    """
-    U with Q Q'x R^-1 = Q U, the coordinates of the projected regressors.
-
-    Parameters
-    ----------
-    x : ndarray
-        Regressors (nobs by nvar).
-    z_basis : ndarray
-        Orthonormal basis of the instruments (nobs by ninstr).
-    r : ndarray
-        Upper triangular factor (nvar by nvar), see :func:`kclass_factors`.
-
-    Returns
-    -------
-    ndarray
-        U (ninstr by nvar).
-    """
-    return solve_triangular(r, (z_basis.T @ x).T, trans="T").T
+    qy, r = qr_multiply(x, y.reshape(y.shape[0], -1).T, mode="right")
+    return (qy[0] if y.ndim == 1 else qy.T), r
 
 
 def kclass_solve(factors: KClassFactors) -> linearmodels.typing.data.Float64Array:
@@ -403,15 +342,10 @@ def kclass_solve(factors: KClassFactors) -> linearmodels.typing.data.Float64Arra
     ndarray
         The estimate :math:`R^{-1}G^{-1}t` (nvar by 1).
     """
-    r, g = factors.r, factors.g
     t = cast("linearmodels.typing.data.Float64Array", factors.t)
-    if r.shape[0] == 0:
-        # No regressors. solve_triangular of SciPy 1.13 and earlier raises
-        # LinAlgError for empty arrays
-        return t
-    if g is not None:
-        t = np.linalg.solve(g, t)
-    return solve_triangular(r, t)
+    if factors.g is not None:
+        t = np.linalg.solve(factors.g, t)
+    return solve_triangular(factors.r, t)
 
 
 class IVFormulaParser:
