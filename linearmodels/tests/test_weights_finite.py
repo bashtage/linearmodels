@@ -252,8 +252,27 @@ def test_missing_weights_are_dropped_with_their_observations(name):
     assert res.nobs == expected.nobs
 
 
-@pytest.mark.parametrize("kind", EXTREME)
-@pytest.mark.parametrize("name", MODELS)
+# With weights over 600 orders of magnitude, a handful of the 120 observations carry
+# all of the weight, so that the weighted instruments of the IV models are rank
+# deficient. The models test the weighted columns, which the estimates use
+IV_MODELS = ["IV2SLS", "IVLIML", "IVGMM", "IVGMMCUE", "IVJIVE"]
+SCALED_CASES = [
+    (name, kind)
+    for name in MODELS
+    for kind in EXTREME
+    if not (kind == "many scales" and name in IV_MODELS)
+]
+
+
+@pytest.mark.parametrize("name", IV_MODELS)
+def test_weights_over_many_scales_leave_rank_deficient_instruments(name):
+    with pytest.raises(
+        ValueError, match=r"instruments .* do not have full column rank"
+    ):
+        build(name, extreme("many scales"))
+
+
+@pytest.mark.parametrize(("name", "kind"), SCALED_CASES)
 def test_extreme_weights_are_finite_when_they_are_scaled(name, kind):
     # Half of the weights of the mixed 1e308 and 1e-308 are 0 once they are scaled,
     # which leaves cross-sections of Fama-MacBeth with too few observations

@@ -166,41 +166,60 @@ def annihilate(
     return y - proj(y, x, method=method)
 
 
-def full_column_rank(x: linearmodels.typing.data.Float64Array, tol: float) -> bool:
+def rank_tests(
+    x: linearmodels.typing.data.Float64Array, tol: float, *, basis: bool = False
+) -> tuple[bool, bool, linearmodels.typing.data.Float64Array | None]:
     """
-    Test whether a matrix has full column rank after scaling its columns.
+    The rank tests of method="pinv" and method="qr" from one QR decomposition.
 
     Parameters
     ----------
     x : ndarray
         Matrix to test (nobs by nvar).
     tol : float
-        Relative tolerance. x is rank deficient if the smallest singular value of x
-        with columns scaled to unit length is no larger than tol times the largest,
-        that is, if the condition number of that matrix is at least 1 / tol.
+        Relative tolerance of the test of method="qr". x is rank deficient if the
+        smallest singular value of x with columns scaled to unit length is no larger
+        than tol times the largest, that is, if the condition number of that matrix
+        is at least 1 / tol.
+    basis : bool, optional
+        Whether to return the orthonormal basis of x. The default is False.
 
     Returns
     -------
-    bool
-        True if x has full column rank.
+    pinv_full_rank : bool
+        Whether x has full column rank as ``numpy.linalg.matrix_rank`` tests it: no
+        singular value is at most the largest times max(nobs, nvar) times the machine
+        precision.
+    qr_full_rank : bool
+        Whether x has full column rank after scaling its columns to unit length. The
+        test does not depend on the units of the columns of x.
+    q : ndarray or None
+        The nobs by nvar factor Q of the Householder QR decomposition of x, which is
+        :func:`orthonormal_basis`, if ``basis`` is True and x has full column rank
+        for method="qr". None otherwise.
 
     Notes
     -----
-    The test does not depend on the units of the columns of x. A column that is 0
-    makes x rank deficient, and so do fewer rows than columns.
+    The singular values of the triangular factor R of x = QR are those of x, with the
+    same backward error as an SVD of x, and those of R with its columns scaled by the
+    norms of the columns of x are those of the scaled x. A column that is 0 makes x
+    rank deficient, and so do fewer rows than columns.
     """
     nobs, nvar = x.shape
     if nobs < nvar:
-        return False
+        return False, False, None
+    if basis:
+        q, r = sp_qr(x, mode="economic", check_finite=False)
+    else:
+        q, r = None, sp_qr(x, mode="raw", check_finite=False)[1]
+    sv = np.linalg.svd(r, compute_uv=False)
+    pinv_full_rank = bool(np.all(sv > sv[0] * max(nobs, nvar) * np.finfo(float).eps))
     scale = np.linalg.norm(x, axis=0)
     if not np.all(scale > 0):
-        return False
-    # The singular values of the triangular factor of the Householder QR
-    # decomposition are those of the scaled columns, with the same backward error
-    # as an SVD of the scaled columns, and the decomposition is cheaper
-    r = sp_qr(x / scale, mode="raw", overwrite_a=True, check_finite=False)[1]
-    sv = np.linalg.svd(r, compute_uv=False)
-    return bool(sv[-1] > tol * sv[0])
+        return pinv_full_rank, False, None
+    sv = np.linalg.svd(r / scale, compute_uv=False)
+    qr_full_rank = bool(sv[-1] > tol * sv[0])
+    return pinv_full_rank, qr_full_rank, q if qr_full_rank else None
 
 
 def orthonormal_basis(

@@ -165,7 +165,7 @@ def test_kclass_estimates_are_exact(delta, options, permute):
     if permute:
         rows = np.random.default_rng(0).permutation(NOBS)
         data = tuple(a[rows] for a in data)
-    res = IVLIML(*data, method="qr", **options).fit()
+    res = IVLIML(*data, **options).fit(method="qr")
     assert_allclose(res.params.to_numpy(), np.ones(3), rtol=rtol)
 
 
@@ -173,7 +173,7 @@ def test_fuller_estimate_is_accurate():
     # kappa is 0.983 and y - Xb has a residual of norm 8, so that the error is bounded
     # by about (1 - kappa) cond(X)^2 eps, 2.4e-5 here. It is at most 1.6e-6 over 40
     # orders of the rows (Windows, OpenBLAS). method="pinv" is 1.2e-4 off
-    res = IVLIML(*hadamard_data(2.0**-20), method="qr", fuller=1.0).fit()
+    res = IVLIML(*hadamard_data(2.0**-20), fuller=1.0).fit(method="qr")
     assert_allclose(res.kappa, 1 - 1 / (NOBS - 4), rtol=1e-12)
     assert_allclose(res.params.to_numpy(), np.ones(3), rtol=5e-5)
 
@@ -182,8 +182,8 @@ def test_fuller_estimate_is_accurate():
 @pytest.mark.parametrize("cov_type", list(COV_OPTIONS))
 def test_2sls_estimates_and_covariance_are_exact(delta, cov_type):
     delta, rtol = delta
-    mod = IV2SLS(*hadamard_data(delta), method="qr")
-    res = mod.fit(cov_type=cov_type, **COV_OPTIONS[cov_type])
+    mod = IV2SLS(*hadamard_data(delta))
+    res = mod.fit(cov_type=cov_type, method="qr", **COV_OPTIONS[cov_type])
     assert_allclose(res.params.to_numpy(), np.ones(3), rtol=rtol)
     expected = exact_cov(delta, cov_type)
     se = np.sqrt(np.diag(expected))
@@ -202,12 +202,13 @@ def test_nearly_collinear_regressors():
     # A condition number of about 1e10, which the check of method="pinv" accepts
     data = hadamard_data(2.0**-33)
     with pytest.raises(ValueError, match=r"regressors .* collinear"):
-        IV2SLS(*data, method="qr")
+        IV2SLS(*data).fit(method="qr")
     with pytest.raises(ValueError, match=r"regressors .* collinear"):
-        IVLIML(*data, method="qr")
+        IVLIML(*data).fit(method="qr")
     with warnings.catch_warnings():
         warnings.simplefilter("error")
-        IV2SLS(*data, method="pinv")
+        mod = IV2SLS(*data)
+    assert list(mod._rank_errors) == ["qr"]
 
 
 def formula_frame(data):
@@ -229,29 +230,29 @@ def test_nearly_collinear_instruments():
     instr = instr.copy()
     instr[:, 1] = instr[:, 0] + 2.0**-33 * hadamard(NOBS)[:, 7]
     with pytest.raises(ValueError, match=r"instruments .* collinear"):
-        IV2SLS(y, exog, endog, instr, method="qr")
-    IV2SLS(y, exog, endog, instr, method="pinv")
+        IV2SLS(y, exog, endog, instr).fit(method="qr")
+    IV2SLS(y, exog, endog, instr).fit(method="pinv")
 
 
 def test_exactly_collinear_or_zero_columns_are_rank_deficient():
+    # No method can estimate these, so that the model rejects them
     y, exog, endog, instr = hadamard_data(2.0**-10)
     with pytest.raises(ValueError, match="regressors"):
-        IV2SLS(y, exog, exog[:, 1:], instr, method="qr")
+        IV2SLS(y, exog, exog[:, 1:], instr)
     zero = instr.copy()
     zero[:, 1] = 0.0
     with pytest.raises(ValueError, match="instruments"):
-        IV2SLS(y, exog, endog, zero, method="qr")
+        IV2SLS(y, exog, endog, zero)
 
 
-@pytest.mark.parametrize("method", ["pinv", "qr"])
-def test_fewer_observations_than_regressors_are_rank_deficient(method):
+def test_fewer_observations_than_regressors_are_rank_deficient():
     # The triangular factor of the QR decomposition of a matrix with fewer rows than
     # columns has full row rank, which is not full column rank
     rng = np.random.default_rng(5)
     nobs = 4
     exog = rng.standard_normal((nobs, 5))
     with pytest.raises(ValueError, match="do not have full column rank"):
-        IV2SLS(rng.standard_normal(nobs), exog, None, None, method=method)
+        IV2SLS(rng.standard_normal(nobs), exog, None, None)
 
 
 def scaled_data():
@@ -270,9 +271,49 @@ def scaled_data():
 def test_unscaled_rank_check_depends_on_the_units():
     y, exog, endog, instr = scaled_data()
     instr = instr * np.array([2.0**50, 1, 1])
+    mod = IV2SLS(y, exog, endog, instr)
     with pytest.raises(ValueError, match=r'do not have full column rank.*method="qr"'):
-        IV2SLS(y, exog, endog, instr)
-    IV2SLS(y, exog, endog, instr, method="qr").fit()
+        mod.fit(method="pinv")
+    mod.fit(method="qr")
+
+
+def weighted_collinear_data():
+    # Two instruments that are equal up to 1e-11 on the rows with most of the weight,
+    # and differ on the others. The condition number of the scaled instruments is 2.5,
+    # and 4.1e9 with the weights
+    rng = np.random.default_rng(0)
+    nobs, heavy = 1000, np.arange(1000) < 50
+    z1 = rng.standard_normal(nobs)
+    z2 = z1 + np.where(heavy, 1e-11, 1.0) * rng.standard_normal(nobs)
+    endog = z1 + z2 + rng.standard_normal(nobs)
+    y = 1 + endog + rng.standard_normal(nobs)
+    weights = np.where(heavy, 1.0, 1e-20)
+    return (y, np.ones((nobs, 1)), endog, np.c_[z1, z2]), weights
+
+
+def test_rank_check_uses_the_weighted_columns():
+    data, weights = weighted_collinear_data()
+    IV2SLS(*data).fit(method="qr")
+    mod = IV2SLS(*data, weights=weights)
+    with pytest.raises(ValueError, match=r"instruments .* collinear"):
+        mod.fit(method="qr")
+    mod.fit(method="pinv")
+
+
+def test_qr_uses_the_basis_of_the_weighted_instruments():
+    y, exog, endog, instr = scaled_data()
+    weights = np.random.default_rng(2).uniform(0.1, 10.0, y.shape[0])
+    mod = IV2SLS(y, exog, endog, instr, weights=weights)
+    basis = mod._qr_z_basis
+    assert_allclose(basis.T @ basis, np.eye(basis.shape[1]), atol=1e-14)
+    assert_allclose(basis @ (basis.T @ mod._wz), mod._wz, rtol=1e-12, atol=1e-12)
+    res = mod.fit(cov_type="unadjusted", method="qr")
+    # The estimate from a new decomposition of the weighted instruments
+    expected = IV2SLS.estimate_parameters(mod._wx, mod._wy, mod._wz, 1.0, method="qr")
+    assert_allclose(res.params.to_numpy(), expected.ravel(), rtol=1e-12)
+    pinv = mod.fit(cov_type="unadjusted", method="pinv")
+    assert_allclose(res.params, pinv.params, rtol=1e-10)
+    assert_allclose(res.cov, pinv.cov, rtol=1e-9)
 
 
 def test_default_is_pinv():
@@ -280,25 +321,39 @@ def test_default_is_pinv():
     for model in (IV2SLS, IVLIML):
         with pytest.warns(FutureWarning, match="The default method of"):
             default = model(*data).fit(cov_type="robust")
-        pinv = model(*data, method="pinv").fit(cov_type="robust")
+        pinv = model(*data).fit(cov_type="robust", method="pinv")
         assert_allclose(default.params, pinv.params, rtol=1e-14)
         assert_allclose(default.cov, pinv.cov, rtol=1e-14)
-        assert default.model._numerical_method == "pinv"
+        assert default.fit_method == "pinv"
 
 
 @pytest.mark.parametrize("method", ["QR", "Pinv"])
 def test_method_is_not_case_sensitive(method):
-    mod = IV2SLS(*scaled_data(), method=method)
-    assert mod._numerical_method == method.lower()
+    res = IV2SLS(*scaled_data()).fit(method=method)
+    assert res.fit_method == method.lower()
+
+
+@pytest.mark.parametrize("model", [IV2SLS, IVLIML])
+def test_one_model_is_fit_with_both_methods(model):
+    # The method is not stored on the model, so that the results of a fit do not
+    # depend on the fits before it, and the diagnostics use the method of the fit
+    mod = model(*scaled_data())
+    qr = mod.fit(method="qr")
+    pinv = mod.fit(method="pinv")
+    assert (qr.fit_method, pinv.fit_method) == ("qr", "pinv")
+    for res, method in ((qr, "qr"), (pinv, "pinv")):
+        fresh = model(*scaled_data()).fit(method=method)
+        assert_allclose(res.params, fresh.params, rtol=1e-14)
+        assert_allclose(res.cov, fresh.cov, rtol=1e-14)
+        expected = statistics(fresh)
+        for key, value in statistics(res).items():
+            assert_allclose(value, expected[key], rtol=1e-14, err_msg=key)
 
 
 @pytest.mark.parametrize(
     "func",
     [
-        IV2SLS,
-        IVLIML,
-        IV2SLS.from_formula,
-        IVLIML.from_formula,
+        IV2SLS.fit,
         IVLIML.estimate_parameters,
         HomoskedasticCovariance,
         HeteroskedasticCovariance,
@@ -319,10 +374,19 @@ def test_method_is_keyword_only(func):
     assert parameter.kind is inspect.Parameter.KEYWORD_ONLY
 
 
+@pytest.mark.parametrize(
+    "func",
+    [IV2SLS, IVLIML, IV2SLS.from_formula, IVLIML.from_formula],
+    ids=lambda func: func.__qualname__,
+)
+def test_the_models_do_not_take_method(func):
+    assert "method" not in inspect.signature(func).parameters
+
+
 @pytest.mark.parametrize("method", ["svd", 1, ""])
 def test_invalid_method(method):
     with pytest.raises(ValueError, match="method must be"):
-        IV2SLS(*scaled_data(), method=method)
+        IV2SLS(*scaled_data()).fit(method=method)
     y, exog, endog, instr = scaled_data()
     x = np.c_[exog, endog]
     z = np.c_[exog, instr]
@@ -379,11 +443,11 @@ def test_qr_agrees_with_pinv(model, cov_type, debiased):
     cov_options = dict(COV_OPTIONS[cov_type])
     if cov_type == "clustered":
         cov_options["clusters"] = np.arange(data[0].shape[0]) // 10
-    pinv = cls(*data, method="pinv", **options).fit(
-        cov_type=cov_type, debiased=debiased, **cov_options
+    pinv = cls(*data, **options).fit(
+        cov_type=cov_type, debiased=debiased, method="pinv", **cov_options
     )
-    qr = cls(*data, method="qr", **options).fit(
-        cov_type=cov_type, debiased=debiased, **cov_options
+    qr = cls(*data, **options).fit(
+        cov_type=cov_type, debiased=debiased, method="qr", **cov_options
     )
     assert_allclose(qr.params, pinv.params, rtol=1e-10)
     assert_allclose(qr.cov, pinv.cov, rtol=1e-9)
@@ -419,9 +483,9 @@ def test_qr_does_not_depend_on_the_units(model, cov_type, units):
     if cov_type == "clustered":
         cov_options["clusters"] = np.arange(data[0].shape[0]) // 10
     scale, multiplier = UNITS[units]
-    base = cls(*data, method="qr", **options).fit(cov_type=cov_type, **cov_options)
-    res = cls(*scale(*data), method="qr", **options).fit(
-        cov_type=cov_type, **cov_options
+    base = cls(*data, **options).fit(cov_type=cov_type, method="qr", **cov_options)
+    res = cls(*scale(*data), **options).fit(
+        cov_type=cov_type, method="qr", **cov_options
     )
     multiplier = np.asarray(multiplier)
     assert_allclose(
@@ -454,7 +518,20 @@ def test_kappa_with_two_endogenous_regressors_does_not_depend_on_the_units(scale
     expected = reference_kappa(y, exog, endog, instr)
     y = y * scales[0]
     endog = endog * np.array(scales[1:])
-    res = IVLIML(y, exog, endog, instr, method="qr").fit()
+    res = IVLIML(y, exog, endog, instr).fit(method="qr")
+    assert_allclose(res.kappa, expected, rtol=1e-10)
+
+
+def test_kappa_with_weights():
+    # The basis of the weighted exog is the first columns of the basis of the weighted
+    # instruments
+    y, exog, endog, instr = scaled_data()
+    weights = np.random.default_rng(3).uniform(0.1, 10.0, y.shape[0])
+    root = np.sqrt(weights / weights.mean())
+    expected = reference_kappa(
+        y * root, exog * root[:, None], endog * root[:, None], instr * root[:, None]
+    )
+    res = IVLIML(y, exog, endog, instr, weights=weights).fit(method="qr")
     assert_allclose(res.kappa, expected, rtol=1e-10)
 
 
@@ -653,8 +730,9 @@ def test_projections_agree(shape):
 )
 def test_the_default_warns_of_the_change_in_8(create):
     data = hadamard_data(2.0**-10)
+    mod = create(data)
     with pytest.warns(FutureWarning) as record:
-        create(data)
+        mod.fit()
     assert len(record) == 1
     message = str(record[0].message)
     assert re.match(
@@ -674,12 +752,12 @@ def test_an_explicit_method_does_not_warn(method):
     data = hadamard_data(2.0**-10)
     with warnings.catch_warnings():
         warnings.simplefilter("error")
-        IV2SLS(*data, method=method).fit()
-        IVLIML(*data, method=method).fit()
+        IV2SLS(*data).fit(method=method)
+        IVLIML(*data).fit(method=method)
         res = IV2SLS.from_formula(
-            "y ~ 0 + h0 + h1 + [w ~ h2 + h3]", formula_frame(data), method=method
-        ).fit()
-        # The diagnostics use the method of the model, and do not warn either
+            "y ~ 0 + h0 + h1 + [w ~ h2 + h3]", formula_frame(data)
+        ).fit(method=method)
+        # The diagnostics use the method of the fit, and do not warn either
         diagnostics = res.first_stage.diagnostics
         tests = (res.wooldridge_regression, res.durbin(), res.wu_hausman())
     assert diagnostics.shape[0] == 1
@@ -690,7 +768,8 @@ def test_models_without_the_method_keyword_do_not_warn():
     data = hadamard_data(2.0**-10)
     with warnings.catch_warnings():
         warnings.simplefilter("error")
-        IVGMM(*data).fit()
+        res = IVGMM(*data).fit()
+    assert res.fit_method == "pinv"
 
 
 def lower_level_calls():
@@ -700,7 +779,7 @@ def lower_level_calls():
     yc = y[:, None]
     params = IVLIML.estimate_parameters(x, yc, z, 1.0, method="pinv")
     clusters = np.arange(y.shape[0]) // 10
-    data = IV2SLS(y, exog, endog, instr, method="pinv")
+    data = IV2SLS(y, exog, endog, instr)
     return {
         "HomoskedasticCovariance": lambda: HomoskedasticCovariance(x, yc, z, params),
         "HeteroskedasticCovariance": lambda: HeteroskedasticCovariance(
@@ -753,8 +832,8 @@ def test_lower_level_functions_do_not_warn_inside_linearmodels(cov_type):
     with warnings.catch_warnings():
         warnings.simplefilter("error")
         for method in ("pinv", "qr"):
-            res = IV2SLS(y, exog, endog, instr, method=method).fit(
-                cov_type=cov_type, **cov_options
+            res = IV2SLS(y, exog, endog, instr).fit(
+                cov_type=cov_type, method=method, **cov_options
             )
             first_stage = res.first_stage
             stats = (
