@@ -1,0 +1,6 @@
+linearmodels.iv.results.OLSResults.fit\_method
+==============================================
+
+.. currentmodule:: linearmodels.iv.results
+
+.. autoproperty:: OLSResults.fit_method

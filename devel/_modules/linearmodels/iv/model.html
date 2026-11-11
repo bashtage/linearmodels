@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.iv.model - linearmodels v7.2 (+69)</title>
+        <title>linearmodels.iv.model - linearmodels v7.2 (+74)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.2 (+69)" class="md-header__button md-logo" aria-label="linearmodels v7.2 (+69)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.2 (+74)" class="md-header__button md-logo" aria-label="linearmodels v7.2 (+74)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.2 (+69)
+            linearmodels v7.2 (+74)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.2 (+69)" class="md-nav__button md-logo" aria-label="linearmodels v7.2 (+69)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.2 (+74)" class="md-nav__button md-logo" aria-label="linearmodels v7.2 (+74)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.2 (+69)
+    linearmodels v7.2 (+74)
   </label>
   
     <div class="md-nav__source">
@@ -580,10 +580,10 @@
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.iv._utility</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">IVFormulaParser</span><span class="p">,</span>
-    <span class="n">full_column_rank</span><span class="p">,</span>
     <span class="n">kclass_factors</span><span class="p">,</span>
     <span class="n">kclass_solve</span><span class="p">,</span>
     <span class="n">orthonormal_basis</span><span class="p">,</span>
+    <span class="n">rank_tests</span><span class="p">,</span>
     <span class="n">resolve_method</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">linearmodels.iv.common</span><span class="w"> </span><span class="kn">import</span> <span class="n">f_statistic</span><span class="p">,</span> <span class="n">find_constant</span>
@@ -781,12 +781,6 @@
 <span class="sd">    kappa : float, optional</span>
 <span class="sd">        Parameter value for k-class estimation. If not provided, it is computed to</span>
 <span class="sd">        produce the LIML parameter estimate.</span>
-<span class="sd">    method : {"pinv", "qr"}, optional</span>
-<span class="sd">        Numerical method, not case sensitive. "qr" is more accurate and does not</span>
-<span class="sd">        depend on the units of the variables. "pinv" is the method of linearmodels</span>
-<span class="sd">        7.1. If not given, "pinv" is used and a ``FutureWarning`` is issued, since</span>
-<span class="sd">        the default will be "qr" in linearmodels 8.0. See the Notes of</span>
-<span class="sd">        :class:`IV2SLS`.</span>
 
 <span class="sd">    Raises</span>
 <span class="sd">    ------</span>
@@ -796,16 +790,9 @@
 <span class="sd">        does not have full column rank, if all observations have a missing value,</span>
 <span class="sd">        if the inputs have different numbers of observations or labels that do</span>
 <span class="sd">        not match (see Notes), if ``weights`` are not strictly positive and</span>
-<span class="sd">        finite, if ``kappa`` or ``fuller`` is not a scalar, or if ``method`` is</span>
-<span class="sd">        not "pinv", "qr" or None.</span>
+<span class="sd">        finite, or if ``kappa`` or ``fuller`` is not a scalar.</span>
 <span class="sd">    TypeError</span>
 <span class="sd">        If an input is complex or cannot be converted to float64.</span>
-
-<span class="sd">    Warns</span>
-<span class="sd">    -----</span>
-<span class="sd">    FutureWarning</span>
-<span class="sd">        If ``method`` is not given, since the default will change from "pinv" to</span>
-<span class="sd">        "qr" in linearmodels 8.0.</span>
 
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
@@ -853,10 +840,7 @@
         <span class="n">weights</span><span class="p">:</span> <span class="n">IVDataLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">fuller</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">Numeric</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
         <span class="n">kappa</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">OptionalNumeric</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">method</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"pinv"</span><span class="p">,</span> <span class="s2">"qr"</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="s2">"pinv"</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="c1"># IVGMM, IVGMMCUE and IVJIVE do not take method, and use "pinv"</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_numerical_method</span> <span class="o">=</span> <span class="n">resolve_method</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dependent</span> <span class="o">=</span> <span class="n">IVData</span><span class="p">(</span><span class="n">dependent</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="s2">"dependent"</span><span class="p">)</span>
         <span class="n">nobs</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dependent</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">exog</span> <span class="o">=</span> <span class="n">IVData</span><span class="p">(</span><span class="n">exog</span><span class="p">,</span> <span class="n">var_name</span><span class="o">=</span><span class="s2">"exog"</span><span class="p">,</span> <span class="n">nobs</span><span class="o">=</span><span class="n">nobs</span><span class="p">)</span>
@@ -1073,7 +1057,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_formula</span> <span class="o">=</span> <span class="n">value</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_validate_inputs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">x</span><span class="p">,</span> <span class="n">z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_z</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_x</span>
         <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"Model must contain at least one regressor."</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">instruments</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">endog</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
@@ -1082,18 +1066,34 @@
                 <span class="s2">"as large as the number of endogenous regressors"</span>
                 <span class="s2">" (</span><span class="si">{}</span><span class="s2">)."</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instruments</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">endog</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
             <span class="p">)</span>
+        <span class="c1"># The weighted regressors and instruments are tested, since the estimates use</span>
+        <span class="c1"># them. They are x and z if the model has no weights or equal weights</span>
         <span class="n">checks</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="s2">"regressors [exog endog] do not have full column rank"</span><span class="p">),</span>
-            <span class="p">(</span><span class="n">z</span><span class="p">,</span> <span class="s2">"instruments [exog instruments]  do not have full column rank"</span><span class="p">),</span>
+            <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_wx</span><span class="p">,</span> <span class="s2">"regressors [exog endog] do not have full column rank"</span><span class="p">,</span> <span class="kc">False</span><span class="p">),</span>
+            <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_wz</span><span class="p">,</span>
+                <span class="s2">"instruments [exog instruments]  do not have full column rank"</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_supports_qr</span><span class="p">,</span>
+            <span class="p">),</span>
         <span class="p">)</span>
-        <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">message</span> <span class="ow">in</span> <span class="n">checks</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_numerical_method</span> <span class="o">==</span> <span class="s2">"qr"</span><span class="p">:</span>
-                <span class="c1"># Tested on the columns scaled to unit length, so not on their units</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="n">full_column_rank</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">_RANK_TOLERANCE</span><span class="p">):</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">message</span><span class="si">}</span><span class="s2">. </span><span class="si">{</span><span class="n">_RANK_MESSAGE</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">matrix_rank</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">a</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
-                <span class="n">hint</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_supports_qr</span> <span class="ow">and</span> <span class="n">full_column_rank</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">_RANK_TOLERANCE</span><span class="p">)</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">message</span> <span class="o">+</span> <span class="p">(</span><span class="s2">"."</span> <span class="o">+</span> <span class="n">_SCALE_HINT</span> <span class="k">if</span> <span class="n">hint</span> <span class="k">else</span> <span class="s2">""</span><span class="p">))</span>
+        <span class="c1"># The error that fit raises for a method that cannot estimate the model. The</span>
+        <span class="c1"># model is only rejected here if no method can estimate it</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rank_errors</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="c1"># The orthonormal basis of the weighted instruments, which fit uses with</span>
+        <span class="c1"># method="qr". Its first columns are a basis of the weighted exog</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_qr_z_basis</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">keep_basis</span> <span class="ow">in</span> <span class="n">checks</span><span class="p">:</span>
+            <span class="c1"># "qr" tests the columns scaled to unit length, so not their units</span>
+            <span class="n">pinv_ok</span><span class="p">,</span> <span class="n">qr_ok</span><span class="p">,</span> <span class="n">basis</span> <span class="o">=</span> <span class="n">rank_tests</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">_RANK_TOLERANCE</span><span class="p">,</span> <span class="n">basis</span><span class="o">=</span><span class="n">keep_basis</span><span class="p">)</span>
+            <span class="n">qr_ok</span> <span class="o">=</span> <span class="n">qr_ok</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_supports_qr</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">pinv_ok</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">qr_ok</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_rank_errors</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">"pinv"</span><span class="p">,</span> <span class="n">message</span> <span class="o">+</span> <span class="s2">"."</span> <span class="o">+</span> <span class="n">_SCALE_HINT</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="ow">not</span> <span class="n">qr_ok</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">_supports_qr</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_rank_errors</span><span class="o">.</span><span class="n">setdefault</span><span class="p">(</span><span class="s2">"qr"</span><span class="p">,</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">message</span><span class="si">}</span><span class="s2">. </span><span class="si">{</span><span class="n">_RANK_MESSAGE</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">keep_basis</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_qr_z_basis</span> <span class="o">=</span> <span class="n">basis</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_has_constant</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_const_loc</span> <span class="o">=</span> <span class="n">has_constant</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 
     <span class="c1"># The k-class models can be estimated with method="qr"</span>
@@ -1205,10 +1205,16 @@
         <span class="k">return</span> <span class="n">f_statistic</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">cov</span><span class="p">,</span> <span class="n">debiased</span><span class="p">,</span> <span class="n">nobs</span> <span class="o">-</span> <span class="n">nvar</span><span class="p">,</span> <span class="n">const_loc</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_estimate_kappa</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"pinv"</span><span class="p">,</span> <span class="s2">"qr"</span><span class="p">]</span> <span class="o">=</span> <span class="s2">"pinv"</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        The value of kappa in LIML, which is the same for any estimator</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        method : {"pinv", "qr"}, optional</span>
+<span class="sd">            The numerical method. The default is "pinv", which the models without</span>
+<span class="sd">            ``method`` use.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -1263,19 +1269,22 @@
                 <span class="s2">"and instruments are linearly independent."</span>
             <span class="p">)</span>
 
-        <span class="n">qr_method</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_numerical_method</span> <span class="o">==</span> <span class="s2">"qr"</span>
+        <span class="n">qr_method</span> <span class="o">=</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">"qr"</span>
         <span class="c1"># x1 is z without endogenous regressors and instruments, as in OLS</span>
         <span class="n">same</span> <span class="o">=</span> <span class="n">x1</span><span class="o">.</span><span class="n">shape</span> <span class="o">==</span> <span class="n">z</span><span class="o">.</span><span class="n">shape</span> <span class="ow">and</span> <span class="n">array_equal</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span>
-        <span class="c1"># The residuals on x1 are computed before z is decomposed, so that the two</span>
+        <span class="c1"># With "qr", the basis of z from the rank check. x1 is the first columns of z,</span>
+        <span class="c1"># so that the first columns of the basis are a basis of x1. With "pinv", the</span>
+        <span class="c1"># residuals on x1 are computed before z is decomposed, so that the two</span>
         <span class="c1"># decompositions are not in memory at the same time</span>
+        <span class="n">z_basis</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">"linearmodels.typing.data.Float64Array"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_qr_z_basis</span><span class="p">)</span>
         <span class="n">ex1</span> <span class="o">=</span> <span class="n">e</span>
         <span class="k">if</span> <span class="n">x1</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">same</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">qr_method</span><span class="p">:</span>
-                <span class="n">ex1</span> <span class="o">=</span> <span class="n">_residuals</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">orthonormal_basis</span><span class="p">(</span><span class="n">x1</span><span class="p">))</span>
+                <span class="n">ex1</span> <span class="o">=</span> <span class="n">_residuals</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">z_basis</span><span class="p">[:,</span> <span class="p">:</span> <span class="n">x1</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]])</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">ex1</span> <span class="o">=</span> <span class="n">e</span> <span class="o">-</span> <span class="n">x1</span> <span class="o">@</span> <span class="p">(</span><span class="n">pinv</span><span class="p">(</span><span class="n">x1</span><span class="p">)</span> <span class="o">@</span> <span class="n">e</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">qr_method</span><span class="p">:</span>
-            <span class="n">z_dec</span> <span class="o">=</span> <span class="n">orthonormal_basis</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
+            <span class="n">z_dec</span> <span class="o">=</span> <span class="n">z_basis</span>
             <span class="n">ez</span> <span class="o">=</span> <span class="n">_residuals</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">z_dec</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">z_dec</span> <span class="o">=</span> <span class="n">pinv</span><span class="p">(</span><span class="n">z</span><span class="p">)</span>
@@ -1392,12 +1401,6 @@
 <span class="sd">    kappa : float, optional</span>
 <span class="sd">        Parameter value for k-class estimation. If not provided, it is computed to</span>
 <span class="sd">        produce the LIML parameter estimate.</span>
-<span class="sd">    method : {"pinv", "qr"}, optional</span>
-<span class="sd">        Numerical method, not case sensitive. "qr" is more accurate and does not</span>
-<span class="sd">        depend on the units of the variables. "pinv" is the method of linearmodels</span>
-<span class="sd">        7.1. If not given, "pinv" is used and a ``FutureWarning`` is issued, since</span>
-<span class="sd">        the default will be "qr" in linearmodels 8.0. See the Notes of</span>
-<span class="sd">        :class:`IV2SLS`.</span>
 
 <span class="sd">    Raises</span>
 <span class="sd">    ------</span>
@@ -1407,16 +1410,9 @@
 <span class="sd">        does not have full column rank, if all observations have a missing value,</span>
 <span class="sd">        if the inputs have different numbers of observations or labels that do</span>
 <span class="sd">        not match (see Notes), if ``weights`` are not strictly positive and</span>
-<span class="sd">        finite, if ``kappa`` or ``fuller`` is not a scalar, or if ``method`` is</span>
-<span class="sd">        not "pinv", "qr" or None.</span>
+<span class="sd">        finite, or if ``kappa`` or ``fuller`` is not a scalar.</span>
 <span class="sd">    TypeError</span>
 <span class="sd">        If an input is complex or cannot be converted to float64.</span>
-
-<span class="sd">    Warns</span>
-<span class="sd">    -----</span>
-<span class="sd">    FutureWarning</span>
-<span class="sd">        If ``method`` is not given, since the default will change from "pinv" to</span>
-<span class="sd">        "qr" in linearmodels 8.0.</span>
 
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
@@ -1464,7 +1460,6 @@
         <span class="n">weights</span><span class="p">:</span> <span class="n">IVDataLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">fuller</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">Numeric</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
         <span class="n">kappa</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">OptionalNumeric</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">method</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"pinv"</span><span class="p">,</span> <span class="s2">"qr"</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">dependent</span><span class="p">,</span>
@@ -1474,7 +1469,6 @@
             <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">,</span>
             <span class="n">fuller</span><span class="o">=</span><span class="n">fuller</span><span class="p">,</span>
             <span class="n">kappa</span><span class="o">=</span><span class="n">kappa</span><span class="p">,</span>
-            <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">,</span>
         <span class="p">)</span>
 
     <span class="n">_supports_qr</span> <span class="o">=</span> <span class="kc">True</span>
@@ -1525,7 +1519,12 @@
         <span class="k">return</span> <span class="n">kclass_solve</span><span class="p">(</span><span class="n">factors</span><span class="p">)</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">fit</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">cov_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"robust"</span><span class="p">,</span> <span class="n">debiased</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">cov_config</span><span class="p">:</span> <span class="n">Any</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">cov_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">"robust"</span><span class="p">,</span>
+        <span class="n">debiased</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">method</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"pinv"</span><span class="p">,</span> <span class="s2">"qr"</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">cov_config</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">OLSResults</span> <span class="o">|</span> <span class="n">IVResults</span><span class="p">:</span>
 <span class="w">        </span><span class="sa">r</span><span class="sd">"""</span>
 <span class="sd">        Estimate model parameters.</span>
@@ -1549,6 +1548,12 @@
 <span class="sd">        debiased : bool, optional</span>
 <span class="sd">            Flag indicating whether to debias the covariance estimator using</span>
 <span class="sd">            a degree of freedom adjustment. The default is False.</span>
+<span class="sd">        method : {"pinv", "qr"}, optional</span>
+<span class="sd">            Numerical method, not case sensitive. "qr" is more accurate and does not</span>
+<span class="sd">            depend on the units of the variables. "pinv" is the method of</span>
+<span class="sd">            linearmodels 7.1. If not given, "pinv" is used and a ``FutureWarning`` is</span>
+<span class="sd">            issued, since the default will be "qr" in linearmodels 8.0. See the Notes</span>
+<span class="sd">            of :class:`IV2SLS`.</span>
 <span class="sd">        **cov_config : dict</span>
 <span class="sd">            Additional parameters to pass to the covariance estimator. The keys that</span>
 <span class="sd">            are used depend on ``cov_type``. "unadjusted" and "robust" do not use any.</span>
@@ -1590,10 +1595,18 @@
 <span class="sd">            selects does not accept also raises it. The message names the key and lists</span>
 <span class="sd">            the accepted keys. This is checked before the model is estimated. Releases</span>
 <span class="sd">            before 7.1 raised the ``TypeError`` of the constructor of the covariance</span>
-<span class="sd">            estimator.</span>
+<span class="sd">            estimator. It is also raised if ``method`` is not "pinv", "qr" or None,</span>
+<span class="sd">            or if ``[exog, endog]`` or ``[exog, instruments]`` does not have full</span>
+<span class="sd">            column rank for ``method``.</span>
 <span class="sd">        UnknownOptionError</span>
 <span class="sd">            If ``cov_type`` or ``kernel`` is not supported. It is both a</span>
 <span class="sd">            ``KeyError`` and a ``ValueError``.</span>
+
+<span class="sd">        Warns</span>
+<span class="sd">        -----</span>
+<span class="sd">        FutureWarning</span>
+<span class="sd">            If ``method`` is not given, since the default will change from "pinv" to</span>
+<span class="sd">            "qr" in linearmodels 8.0.</span>
 
 <span class="sd">        See Also</span>
 <span class="sd">        --------</span>
@@ -1610,19 +1623,23 @@
 <span class="sd">        supported options. Defaults are used if no covariance configuration</span>
 <span class="sd">        is provided.</span>
 
-<span class="sd">        The estimates and their covariance use the ``method`` of the model, see</span>
-<span class="sd">        the Notes of :class:`IV2SLS`.</span>
+<span class="sd">        The estimates and their covariance use ``method``, see the Notes of</span>
+<span class="sd">        :class:`IV2SLS`. The results report it as ``fit_method``, and their</span>
+<span class="sd">        diagnostics use it.</span>
 <span class="sd">        """</span>
+        <span class="n">method</span> <span class="o">=</span> <span class="n">resolve_method</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">method</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rank_errors</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_rank_errors</span><span class="p">[</span><span class="n">method</span><span class="p">])</span>
         <span class="n">cov_type</span> <span class="o">=</span> <span class="n">lower_option</span><span class="p">(</span><span class="n">cov_type</span><span class="p">)</span>
         <span class="n">check_cov_config</span><span class="p">(</span><span class="n">cov_config</span><span class="p">,</span> <span class="n">cov_type</span><span class="p">,</span> <span class="n">_LS_COV_KEYS</span><span class="p">,</span> <span class="n">KERNEL_LOOKUP</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_clusters</span><span class="p">(</span><span class="n">cov_config</span><span class="p">)</span>
         <span class="n">wy</span><span class="p">,</span> <span class="n">wx</span><span class="p">,</span> <span class="n">wz</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wz</span>
         <span class="n">kappa</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_kappa</span>
-        <span class="c1"># One decomposition of the instruments, by _estimate_kappa, for kappa, the</span>
-        <span class="c1"># estimate and the covariance</span>
+        <span class="c1"># One decomposition of the instruments for kappa, the estimate and the</span>
+        <span class="c1"># covariance: by _estimate_kappa with "pinv", and from the rank check with "qr"</span>
         <span class="n">z_dec</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">liml_kappa</span><span class="p">,</span> <span class="n">z_dec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_estimate_kappa</span><span class="p">()</span>
+            <span class="n">liml_kappa</span><span class="p">,</span> <span class="n">z_dec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_estimate_kappa</span><span class="p">(</span><span class="n">method</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
             <span class="n">liml_kappa</span> <span class="o">=</span> <span class="n">nan</span>
             <span class="k">if</span> <span class="n">kappa</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -1641,8 +1658,9 @@
             <span class="n">est_kappa</span> <span class="o">-=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fuller</span> <span class="o">/</span> <span class="p">(</span><span class="n">nobs</span> <span class="o">-</span> <span class="n">ninstr</span><span class="p">)</span>
 
         <span class="n">reuse</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_numerical_method</span> <span class="o">==</span> <span class="s2">"qr"</span><span class="p">:</span>
-            <span class="n">z_basis</span> <span class="o">=</span> <span class="n">orthonormal_basis</span><span class="p">(</span><span class="n">wz</span><span class="p">)</span> <span class="k">if</span> <span class="n">z_dec</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">z_dec</span>
+        <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="s2">"qr"</span><span class="p">:</span>
+            <span class="c1"># The basis of the weighted instruments from the rank check</span>
+            <span class="n">z_basis</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="s2">"linearmodels.typing.data.Float64Array"</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_qr_z_basis</span><span class="p">)</span>
             <span class="n">factors</span> <span class="o">=</span> <span class="n">kclass_factors</span><span class="p">(</span><span class="n">wx</span><span class="p">,</span> <span class="n">z_basis</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">est_kappa</span><span class="p">),</span> <span class="n">wy</span><span class="p">)</span>
             <span class="n">params</span> <span class="o">=</span> <span class="n">kclass_solve</span><span class="p">(</span><span class="n">factors</span><span class="p">)</span>
             <span class="n">reuse</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"z_basis"</span><span class="p">:</span> <span class="n">z_basis</span><span class="p">,</span> <span class="s2">"factors"</span><span class="p">:</span> <span class="n">factors</span><span class="p">}</span>
@@ -1657,11 +1675,15 @@
         <span class="n">cov_config_copy</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">cov_config</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
         <span class="n">cov_config_copy</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">"center"</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="n">cov_estimator_inst</span> <span class="o">=</span> <span class="n">cov_estimator</span><span class="p">(</span>
-            <span class="n">wx</span><span class="p">,</span> <span class="n">wy</span><span class="p">,</span> <span class="n">wz</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_numerical_method</span><span class="p">,</span> <span class="o">**</span><span class="n">cov_config_copy</span>
+            <span class="n">wx</span><span class="p">,</span> <span class="n">wy</span><span class="p">,</span> <span class="n">wz</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">,</span> <span class="o">**</span><span class="n">cov_config_copy</span>
         <span class="p">)</span>
         <span class="n">cov_estimator_inst</span><span class="o">.</span><span class="n">_reuse</span><span class="p">(</span><span class="o">**</span><span class="n">reuse</span><span class="p">)</span>
 
-        <span class="n">results</span> <span class="o">=</span> <span class="p">{</span><span class="s2">"kappa"</span><span class="p">:</span> <span class="n">est_kappa</span><span class="p">,</span> <span class="s2">"liml_kappa"</span><span class="p">:</span> <span class="n">liml_kappa</span><span class="p">}</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">"kappa"</span><span class="p">:</span> <span class="n">est_kappa</span><span class="p">,</span>
+            <span class="s2">"liml_kappa"</span><span class="p">:</span> <span class="n">liml_kappa</span><span class="p">,</span>
+            <span class="s2">"fit_method"</span><span class="p">:</span> <span class="n">method</span><span class="p">,</span>
+        <span class="p">}</span>
         <span class="n">pe</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_post_estimation</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">cov_estimator_inst</span><span class="p">,</span> <span class="n">cov_type</span><span class="p">)</span>
         <span class="n">results</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">pe</span><span class="p">)</span>
 
@@ -1699,12 +1721,6 @@
 <span class="sd">    kappa : float, optional</span>
 <span class="sd">        Parameter value for k-class estimation. If not provided, it is computed to</span>
 <span class="sd">        produce the LIML parameter estimate.</span>
-<span class="sd">    method : {"pinv", "qr"}, optional</span>
-<span class="sd">        Numerical method, not case sensitive. "qr" is more accurate and does not</span>
-<span class="sd">        depend on the units of the variables. "pinv" is the method of linearmodels</span>
-<span class="sd">        7.1. If not given, "pinv" is used and a ``FutureWarning`` is issued, since</span>
-<span class="sd">        the default will be "qr" in linearmodels 8.0. See the Notes of</span>
-<span class="sd">        :class:`IV2SLS`.</span>
 
 <span class="sd">    Raises</span>
 <span class="sd">    ------</span>
@@ -1714,16 +1730,9 @@
 <span class="sd">        does not have full column rank, if all observations have a missing value,</span>
 <span class="sd">        if the inputs have different numbers of observations or labels that do</span>
 <span class="sd">        not match (see Notes), if ``weights`` are not strictly positive and</span>
-<span class="sd">        finite, if ``kappa`` or ``fuller`` is not a scalar, or if ``method`` is</span>
-<span class="sd">        not "pinv", "qr" or None.</span>
+<span class="sd">        finite, or if ``kappa`` or ``fuller`` is not a scalar.</span>
 <span class="sd">    TypeError</span>
 <span class="sd">        If an input is complex or cannot be converted to float64.</span>
-
-<span class="sd">    Warns</span>
-<span class="sd">    -----</span>
-<span class="sd">    FutureWarning</span>
-<span class="sd">        If ``method`` is not given, since the default will change from "pinv" to</span>
-<span class="sd">        "qr" in linearmodels 8.0.</span>
 
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
@@ -1786,11 +1795,11 @@
 <span class="sd">       endogenous regressor and one instrument. It was NaN on some platforms, with</span>
 <span class="sd">       the estimates and their covariance, and a ``RuntimeWarning`` was emitted.</span>
 
-<span class="sd">    ``method`` is described in the Notes of :class:`IV2SLS`.</span>
+<span class="sd">    The ``method`` of ``fit`` is described in the Notes of :class:`IV2SLS`.</span>
 
 <span class="sd">    .. versionadded:: 7.2</span>
 
-<span class="sd">       The ``method`` keyword.</span>
+<span class="sd">       The ``method`` keyword of ``fit``.</span>
 
 <span class="sd">    Rows are paired by position. An input that carries labels (a pandas</span>
 <span class="sd">    Series or DataFrame with an index other than the default 0, 1, ..., n-1,</span>
@@ -1824,7 +1833,6 @@
         <span class="n">weights</span><span class="p">:</span> <span class="n">IVDataLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">fuller</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">Numeric</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
         <span class="n">kappa</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">OptionalNumeric</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">method</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"pinv"</span><span class="p">,</span> <span class="s2">"qr"</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">dependent</span><span class="p">,</span>
@@ -1834,7 +1842,6 @@
             <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">,</span>
             <span class="n">fuller</span><span class="o">=</span><span class="n">fuller</span><span class="p">,</span>
             <span class="n">kappa</span><span class="o">=</span><span class="n">kappa</span><span class="p">,</span>
-            <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">,</span>
         <span class="p">)</span>
 
 <div class="viewcode-block" id="IVLIML.from_formula">
@@ -1847,7 +1854,6 @@
         <span class="n">weights</span><span class="p">:</span> <span class="n">IVDataLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">fuller</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
         <span class="n">kappa</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">OptionalNumeric</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">method</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"pinv"</span><span class="p">,</span> <span class="s2">"qr"</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">IVLIML</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Create a model from a formula.</span>
@@ -1870,12 +1876,6 @@
 <span class="sd">        kappa : float, optional</span>
 <span class="sd">            Parameter value for k-class estimation. If not provided, it is computed</span>
 <span class="sd">            to produce the LIML parameter estimate.</span>
-<span class="sd">        method : {"pinv", "qr"}, optional</span>
-<span class="sd">            Numerical method, not case sensitive. "qr" is more accurate and does not</span>
-<span class="sd">            depend on the units of the variables. "pinv" is the method of</span>
-<span class="sd">            linearmodels 7.1. If not given, "pinv" is used and a ``FutureWarning`` is</span>
-<span class="sd">            issued, since the default will be "qr" in linearmodels 8.0. See the Notes</span>
-<span class="sd">            of :class:`IV2SLS`.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -1921,7 +1921,6 @@
             <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">,</span>
             <span class="n">fuller</span><span class="o">=</span><span class="n">fuller</span><span class="p">,</span>
             <span class="n">kappa</span><span class="o">=</span><span class="n">kappa</span><span class="p">,</span>
-            <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="n">mod</span><span class="o">.</span><span class="n">formula</span> <span class="o">=</span> <span class="n">formula</span>
         <span class="k">return</span> <span class="n">mod</span></div>
@@ -1951,11 +1950,6 @@
 <span class="sd">        Observation weights used in estimation. The weights must be strictly positive</span>
 <span class="sd">        and finite. They are rescaled to have a mean of 1. A NaN weight is missing, and</span>
 <span class="sd">        its observation is dropped. The default is to weight all observations equally.</span>
-<span class="sd">    method : {"pinv", "qr"}, optional</span>
-<span class="sd">        Numerical method, not case sensitive. "qr" is more accurate and does not</span>
-<span class="sd">        depend on the units of the variables. "pinv" is the method of linearmodels</span>
-<span class="sd">        7.1. If not given, "pinv" is used and a ``FutureWarning`` is issued, since</span>
-<span class="sd">        the default will be "qr" in linearmodels 8.0. See Notes.</span>
 
 <span class="sd">    Raises</span>
 <span class="sd">    ------</span>
@@ -1964,16 +1958,10 @@
 <span class="sd">        endogenous regressors, if ``[exog, endog]`` or ``[exog, instruments]``</span>
 <span class="sd">        does not have full column rank, if all observations have a missing value,</span>
 <span class="sd">        if the inputs have different numbers of observations or labels that do</span>
-<span class="sd">        not match (see Notes), if ``weights`` are not strictly positive and</span>
-<span class="sd">        finite, or if ``method`` is not "pinv", "qr" or None.</span>
+<span class="sd">        not match (see Notes), or if ``weights`` are not strictly positive and</span>
+<span class="sd">        finite.</span>
 <span class="sd">    TypeError</span>
 <span class="sd">        If an input is complex or cannot be converted to float64.</span>
-
-<span class="sd">    Warns</span>
-<span class="sd">    -----</span>
-<span class="sd">    FutureWarning</span>
-<span class="sd">        If ``method`` is not given, since the default will change from "pinv" to</span>
-<span class="sd">        "qr" in linearmodels 8.0.</span>
 
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
@@ -2018,11 +2006,12 @@
 <span class="sd">    and none at c = 1e8. It also tests the rank of the columns as they are, so it</span>
 <span class="sd">    rejects columns on very different scales and accepts nearly collinear ones, such</span>
 <span class="sd">    as a variable and its square. ``"pinv"`` is the default until linearmodels 8.0,</span>
-<span class="sd">    when the default becomes ``"qr"``.</span>
+<span class="sd">    when the default becomes ``"qr"``. With ``weights``, both methods test the</span>
+<span class="sd">    weighted columns, which the estimates use.</span>
 
 <span class="sd">    .. versionadded:: 7.2</span>
 
-<span class="sd">       The ``method`` keyword.</span>
+<span class="sd">       The ``method`` keyword of ``fit``.</span>
 
 <span class="sd">    Rows are paired by position. An input that carries labels (a pandas</span>
 <span class="sd">    Series or DataFrame with an index other than the default 0, 1, ..., n-1,</span>
@@ -2054,7 +2043,6 @@
         <span class="n">instruments</span><span class="p">:</span> <span class="n">IVDataLike</span> <span class="o">|</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">weights</span><span class="p">:</span> <span class="n">IVDataLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">method</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"pinv"</span><span class="p">,</span> <span class="s2">"qr"</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_method</span> <span class="o">=</span> <span class="s2">"IV-2SLS"</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
@@ -2065,7 +2053,6 @@
             <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">,</span>
             <span class="n">fuller</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
             <span class="n">kappa</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-            <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">,</span>
         <span class="p">)</span>
 
 <div class="viewcode-block" id="IV2SLS.from_formula">
@@ -2076,7 +2063,6 @@
         <span class="n">data</span><span class="p">:</span> <span class="n">DataFrame</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">weights</span><span class="p">:</span> <span class="n">IVDataLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">method</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"pinv"</span><span class="p">,</span> <span class="s2">"qr"</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">IV2SLS</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Create a model from a formula.</span>
@@ -2093,12 +2079,6 @@
 <span class="sd">            positive and finite. They are rescaled to have a mean of 1. A NaN weight is</span>
 <span class="sd">            missing, and its observation is dropped. The default is to weight all</span>
 <span class="sd">            observations equally.</span>
-<span class="sd">        method : {"pinv", "qr"}, optional</span>
-<span class="sd">            Numerical method, not case sensitive. "qr" is more accurate and does not</span>
-<span class="sd">            depend on the units of the variables. "pinv" is the method of</span>
-<span class="sd">            linearmodels 7.1. If not given, "pinv" is used and a ``FutureWarning`` is</span>
-<span class="sd">            issued, since the default will be "qr" in linearmodels 8.0. See the Notes</span>
-<span class="sd">            of :class:`IV2SLS`.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -2136,7 +2116,7 @@
 <span class="sd">        """</span>
         <span class="n">parser</span> <span class="o">=</span> <span class="n">IVFormulaParser</span><span class="p">(</span><span class="n">formula</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span>
         <span class="n">dep</span><span class="p">,</span> <span class="n">exog</span><span class="p">,</span> <span class="n">endog</span><span class="p">,</span> <span class="n">instr</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">data</span>
-        <span class="n">mod</span> <span class="o">=</span> <span class="n">IV2SLS</span><span class="p">(</span><span class="n">dep</span><span class="p">,</span> <span class="n">exog</span><span class="p">,</span> <span class="n">endog</span><span class="p">,</span> <span class="n">instr</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">)</span>
+        <span class="n">mod</span> <span class="o">=</span> <span class="n">IV2SLS</span><span class="p">(</span><span class="n">dep</span><span class="p">,</span> <span class="n">exog</span><span class="p">,</span> <span class="n">endog</span><span class="p">,</span> <span class="n">instr</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">)</span>
         <span class="n">mod</span><span class="o">.</span><span class="n">formula</span> <span class="o">=</span> <span class="n">formula</span>
         <span class="k">return</span> <span class="n">mod</span></div>
 </div>
@@ -3619,9 +3599,6 @@
 <span class="sd">        Observation weights used in estimation. The weights must be strictly positive</span>
 <span class="sd">        and finite. They are rescaled to have a mean of 1. A NaN weight is missing, and</span>
 <span class="sd">        its observation is dropped. The default is to weight all observations equally.</span>
-<span class="sd">    method : {"pinv", "qr"}, optional</span>
-<span class="sd">        The numerical method, see :class:`IV2SLS`. The default is "pinv", which</span>
-<span class="sd">        does not warn. The models pass their own method.</span>
 
 <span class="sd">    See Also</span>
 <span class="sd">    --------</span>
@@ -3656,11 +3633,8 @@
         <span class="n">exog</span><span class="p">:</span> <span class="n">IVDataLike</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">weights</span><span class="p">:</span> <span class="n">IVDataLike</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">method</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">"pinv"</span><span class="p">,</span> <span class="s2">"qr"</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="s2">"pinv"</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="n">dependent</span><span class="p">,</span> <span class="n">exog</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">,</span> <span class="n">kappa</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span>
-        <span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">dependent</span><span class="p">,</span> <span class="n">exog</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">,</span> <span class="n">kappa</span><span class="o">=</span><span class="mf">0.0</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_result_container</span> <span class="o">=</span> <span class="n">OLSResults</span></div>
 
 

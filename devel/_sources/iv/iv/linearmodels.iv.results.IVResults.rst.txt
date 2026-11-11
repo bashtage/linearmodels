@@ -40,6 +40,7 @@
       ~IVResults.df_resid
       ~IVResults.f_statistic
       ~IVResults.first_stage
+      ~IVResults.fit_method
       ~IVResults.fitted_values
       ~IVResults.has_constant
       ~IVResults.idiosyncratic

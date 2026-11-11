@@ -98,7 +98,7 @@
     "formula = (\n",
     "    \"ldrugexp ~ 1 + totchr + female + age + linc + blhisp + [hi_empunion ~ ssiratio]\"\n",
     ")\n",
-    "mod = IV2SLS.from_formula(formula, data, method=\"qr\")"
+    "mod = IV2SLS.from_formula(formula, data)"
    ]
   },
   {
@@ -107,7 +107,7 @@
    "metadata": {},
    "outputs": [],
    "source": [
-    "iv_res = mod.fit(cov_type=\"robust\")\n",
+    "iv_res = mod.fit(cov_type=\"robust\", method=\"qr\")\n",
     "print(iv_res)"
    ]
   },
@@ -129,8 +129,8 @@
     "formula = (\n",
     "    \"np.log(drugexp) ~ 1 + totchr + age + linc + blhisp + [hi_empunion ~ ssiratio]\"\n",
     ")\n",
-    "mod = IV2SLS.from_formula(formula, data, method=\"qr\")\n",
-    "iv_res2 = mod.fit(cov_type=\"robust\")"
+    "mod = IV2SLS.from_formula(formula, data)\n",
+    "iv_res2 = mod.fit(cov_type=\"robust\", method=\"qr\")"
    ]
   },
   {
@@ -149,8 +149,8 @@
    "outputs": [],
    "source": [
     "formula = \"ldrugexp ~ 1 + totchr + female + age + linc + blhisp + hi_empunion\"\n",
-    "ols = IV2SLS.from_formula(formula, data, method=\"qr\")\n",
-    "ols_res = ols.fit(cov_type=\"robust\")\n",
+    "ols = IV2SLS.from_formula(formula, data)\n",
+    "ols_res = ols.fit(cov_type=\"robust\", method=\"qr\")\n",
     "print(ols_res)"
    ]
   },

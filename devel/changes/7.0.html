@@ -19,7 +19,7 @@
     
   
       
-        <title>Version 7.2 - linearmodels v7.2 (+69)</title>
+        <title>Version 7.2 - linearmodels v7.2 (+74)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../index.html" title="linearmodels v7.2 (+69)" class="md-header__button md-logo" aria-label="linearmodels v7.2 (+69)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v7.2 (+74)" class="md-header__button md-logo" aria-label="linearmodels v7.2 (+74)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.2 (+69)
+            linearmodels v7.2 (+74)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../index.html" title="linearmodels v7.2 (+69)" class="md-nav__button md-logo" aria-label="linearmodels v7.2 (+69)" data-md-component="logo">
+    <a href="../index.html" title="linearmodels v7.2 (+74)" class="md-nav__button md-logo" aria-label="linearmodels v7.2 (+74)" data-md-component="logo">
       <img src="../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.2 (+69)
+    linearmodels v7.2 (+74)
   </label>
   
     <div class="md-nav__source">
@@ -532,7 +532,8 @@ files of a release only for 14 days after its first upload, so these wheels coul
 be added to 7.1. 7.2 also contains the fixes below.</p>
 <p class="rubric">New features</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">IV2SLS</span></code> and <code class="docutils literal notranslate"><span class="pre">IVLIML</span></code>, and their <code class="docutils literal notranslate"><span class="pre">from_formula</span></code>, have a <code class="docutils literal notranslate"><span class="pre">method</span></code> keyword.
+<li><p><code class="docutils literal notranslate"><span class="pre">IV2SLS.fit</span></code> and <code class="docutils literal notranslate"><span class="pre">IVLIML.fit</span></code> have a <code class="docutils literal notranslate"><span class="pre">method</span></code> keyword, which the results report
+as <code class="docutils literal notranslate"><span class="pre">fit_method</span></code>.
 <code class="docutils literal notranslate"><span class="pre">method=&quot;qr&quot;</span></code> computes the estimates, their covariance and the kappa of LIML from QR
 decompositions, as R’s <code class="docutils literal notranslate"><span class="pre">ivreg</span></code> does, and tests the rank of <code class="docutils literal notranslate"><span class="pre">[exog,</span> <span class="pre">endog]</span></code> and
 <code class="docutils literal notranslate"><span class="pre">[exog,</span> <span class="pre">instruments]</span></code> after scaling their columns to unit length. It does not depend
@@ -559,6 +560,10 @@ observation, in the first category when <code class="docutils literal notranslat
 variables imply, such as dummies that sum to one in a model without a constant. 7.1
 also tested the implied intercept, with one more degree of freedom (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/780">GH780</a>,
 <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/859">GH859</a>, <a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/866">GH866</a>).</p></li>
+<li><p>With <code class="docutils literal notranslate"><span class="pre">weights</span></code>, the IV models test the rank of the weighted regressors and
+instruments, which the estimates use. 7.1 tested the unweighted ones, whose condition
+number can differ greatly, so that a model whose weighted instruments are nearly
+collinear was accepted (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/873">GH873</a>).</p></li>
 </ul>
 <p class="rubric">Backward-incompatible changes</p>
 <ul class="simple">
@@ -593,9 +598,10 @@ would be the last release to support them.</p></li>
 <ul class="simple">
 <li><p>linearmodels 8.0 will raise the minimum versions of Python and NumPy, and of the other
 dependencies.</p></li>
-<li><p>linearmodels 8.0 will use <code class="docutils literal notranslate"><span class="pre">method=&quot;qr&quot;</span></code> by default in <code class="docutils literal notranslate"><span class="pre">IV2SLS</span></code> and <code class="docutils literal notranslate"><span class="pre">IVLIML</span></code>.
-Until then, they and the functions above issue a <code class="docutils literal notranslate"><span class="pre">FutureWarning</span></code> if <code class="docutils literal notranslate"><span class="pre">method</span></code> is
-not given. Pass <code class="docutils literal notranslate"><span class="pre">method=&quot;pinv&quot;</span></code> to keep the current results (<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/870">GH870</a>).</p></li>
+<li><p>linearmodels 8.0 will use <code class="docutils literal notranslate"><span class="pre">method=&quot;qr&quot;</span></code> by default in <code class="docutils literal notranslate"><span class="pre">IV2SLS.fit</span></code> and
+<code class="docutils literal notranslate"><span class="pre">IVLIML.fit</span></code>. Until then, they and the functions above issue a <code class="docutils literal notranslate"><span class="pre">FutureWarning</span></code>
+if <code class="docutils literal notranslate"><span class="pre">method</span></code> is not given. Pass <code class="docutils literal notranslate"><span class="pre">method=&quot;pinv&quot;</span></code> to keep the current results
+(<a class="extlink-issue reference external" href="https://github.com/bashtage/linearmodels/issues/870">GH870</a>).</p></li>
 </ul>
 <p class="rubric">Contributors</p>
 <ul class="simple">

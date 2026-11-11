@@ -1,0 +1,6 @@
+linearmodels.iv.results.IVGMMResults.fit\_method
+================================================
+
+.. currentmodule:: linearmodels.iv.results
+
+.. autoproperty:: IVGMMResults.fit_method

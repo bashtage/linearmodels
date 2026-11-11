@@ -11,7 +11,8 @@ be added to 7.1. 7.2 also contains the fixes below.
 
 .. rubric:: New features
 
-- ``IV2SLS`` and ``IVLIML``, and their ``from_formula``, have a ``method`` keyword.
+- ``IV2SLS.fit`` and ``IVLIML.fit`` have a ``method`` keyword, which the results report
+  as ``fit_method``.
   ``method="qr"`` computes the estimates, their covariance and the kappa of LIML from QR
   decompositions, as R's ``ivreg`` does, and tests the rank of ``[exog, endog]`` and
   ``[exog, instruments]`` after scaling their columns to unit length. It does not depend
@@ -38,6 +39,10 @@ be added to 7.1. 7.2 also contains the fixes below.
   variables imply, such as dummies that sum to one in a model without a constant. 7.1
   also tested the implied intercept, with one more degree of freedom (:issue:`780`,
   :issue:`859`, :issue:`866`).
+- With ``weights``, the IV models test the rank of the weighted regressors and
+  instruments, which the estimates use. 7.1 tested the unweighted ones, whose condition
+  number can differ greatly, so that a model whose weighted instruments are nearly
+  collinear was accepted (:issue:`873`).
 
 .. rubric:: Backward-incompatible changes
 
@@ -72,9 +77,10 @@ be added to 7.1. 7.2 also contains the fixes below.
 
 - linearmodels 8.0 will raise the minimum versions of Python and NumPy, and of the other
   dependencies.
-- linearmodels 8.0 will use ``method="qr"`` by default in ``IV2SLS`` and ``IVLIML``.
-  Until then, they and the functions above issue a ``FutureWarning`` if ``method`` is
-  not given. Pass ``method="pinv"`` to keep the current results (:issue:`870`).
+- linearmodels 8.0 will use ``method="qr"`` by default in ``IV2SLS.fit`` and
+  ``IVLIML.fit``. Until then, they and the functions above issue a ``FutureWarning``
+  if ``method`` is not given. Pass ``method="pinv"`` to keep the current results
+  (:issue:`870`).
 
 .. rubric:: Contributors
 

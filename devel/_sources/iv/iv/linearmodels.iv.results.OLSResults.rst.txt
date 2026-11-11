@@ -34,6 +34,7 @@
       ~OLSResults.df_model
       ~OLSResults.df_resid
       ~OLSResults.f_statistic
+      ~OLSResults.fit_method
       ~OLSResults.fitted_values
       ~OLSResults.has_constant
       ~OLSResults.idiosyncratic

@@ -37,6 +37,7 @@
       ~IVGMMResults.df_resid
       ~IVGMMResults.f_statistic
       ~IVGMMResults.first_stage
+      ~IVGMMResults.fit_method
       ~IVGMMResults.fitted_values
       ~IVGMMResults.has_constant
       ~IVGMMResults.idiosyncratic
