@@ -12,7 +12,7 @@ be added to 7.1. 7.2 also contains the fixes below.
 .. rubric:: New features
 
 - ``IV2SLS.fit`` and ``IVLIML.fit`` have a ``method`` keyword, which the results report
-  as ``numerical_method``.
+  as ``fit_method``.
   ``method="qr"`` computes the estimates, their covariance and the kappa of LIML from QR
   decompositions, as R's ``ivreg`` does, and tests the rank of ``[exog, endog]`` and
   ``[exog, instruments]`` after scaling their columns to unit length. It does not depend

@@ -1080,7 +1080,7 @@ class _IVLSModelBase(_IVModelBase):
         is provided.
 
         The estimates and their covariance use ``method``, see the Notes of
-        :class:`IV2SLS`. The results report it as ``numerical_method``, and their
+        :class:`IV2SLS`. The results report it as ``fit_method``, and their
         diagnostics use it.
         """
         method = resolve_method(method, type(self).__name__)
@@ -1137,7 +1137,7 @@ class _IVLSModelBase(_IVModelBase):
         results = {
             "kappa": est_kappa,
             "liml_kappa": liml_kappa,
-            "numerical_method": method,
+            "fit_method": method,
         }
         pe = self._post_estimation(params, cov_estimator_inst, cov_type)
         results.update(pe)

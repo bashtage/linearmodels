@@ -618,7 +618,7 @@ def assert_results_equal(
         "wald_test",
         "method",
         "kappa",
-        "numerical_method",
+        "fit_method",
     ]
     for attr in attrs:
         if attr in skip:

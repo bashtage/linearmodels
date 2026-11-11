@@ -149,7 +149,7 @@ class _LSModelResultsBase(_SummaryStr):
         self._kappa = results.get("kappa", None)
         # The numerical method of fit. Only IV2SLS and IVLIML have one, the other
         # models use "pinv"
-        self._numerical_method = results.get("numerical_method", "pinv")
+        self._numerical_method = results.get("fit_method", "pinv")
         self._datetime = dt.datetime.now()
         self._cov_estimator = results["cov_estimator"]
         self._original_index = results["original_index"]
@@ -712,7 +712,7 @@ class OLSResults(_LSModelResultsBase):
         return self._kappa
 
     @property
-    def numerical_method(self) -> Literal["pinv", "qr"]:
+    def fit_method(self) -> Literal["pinv", "qr"]:
         """
         Numerical method used to compute the estimates, "pinv" or "qr".
 
