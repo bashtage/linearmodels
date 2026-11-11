@@ -285,13 +285,13 @@ def test_default_is_pinv():
         pinv = model(*data).fit(cov_type="robust", method="pinv")
         assert_allclose(default.params, pinv.params, rtol=1e-14)
         assert_allclose(default.cov, pinv.cov, rtol=1e-14)
-        assert default._numerical_method == "pinv"
+        assert default.numerical_method == "pinv"
 
 
 @pytest.mark.parametrize("method", ["QR", "Pinv"])
 def test_method_is_not_case_sensitive(method):
     res = IV2SLS(*scaled_data()).fit(method=method)
-    assert res._numerical_method == method.lower()
+    assert res.numerical_method == method.lower()
 
 
 @pytest.mark.parametrize("model", [IV2SLS, IVLIML])
@@ -301,7 +301,7 @@ def test_one_model_is_fit_with_both_methods(model):
     mod = model(*scaled_data())
     qr = mod.fit(method="qr")
     pinv = mod.fit(method="pinv")
-    assert (qr._numerical_method, pinv._numerical_method) == ("qr", "pinv")
+    assert (qr.numerical_method, pinv.numerical_method) == ("qr", "pinv")
     for res, method in ((qr, "qr"), (pinv, "pinv")):
         fresh = model(*scaled_data()).fit(method=method)
         assert_allclose(res.params, fresh.params, rtol=1e-14)
@@ -716,7 +716,8 @@ def test_models_without_the_method_keyword_do_not_warn():
     data = hadamard_data(2.0**-10)
     with warnings.catch_warnings():
         warnings.simplefilter("error")
-        IVGMM(*data).fit()
+        res = IVGMM(*data).fit()
+    assert res.numerical_method == "pinv"
 
 
 def lower_level_calls():

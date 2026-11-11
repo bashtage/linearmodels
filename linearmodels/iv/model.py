@@ -1080,7 +1080,8 @@ class _IVLSModelBase(_IVModelBase):
         is provided.
 
         The estimates and their covariance use ``method``, see the Notes of
-        :class:`IV2SLS`. The results remember it, and their diagnostics use it.
+        :class:`IV2SLS`. The results report it as ``numerical_method``, and their
+        diagnostics use it.
         """
         method = resolve_method(method, type(self).__name__)
         if method in self._rank_errors:

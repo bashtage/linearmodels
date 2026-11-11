@@ -711,6 +711,16 @@ class OLSResults(_LSModelResultsBase):
         """Value of kappa in the k-class estimator."""
         return self._kappa
 
+    @property
+    def numerical_method(self) -> Literal["pinv", "qr"]:
+        """
+        Numerical method used to compute the estimates, "pinv" or "qr".
+
+        The ``method`` of ``fit`` of IV2SLS and IVLIML, which the diagnostics of the
+        results also use. IVGMM, IVGMMCUE and IVJIVE always use "pinv".
+        """
+        return self._numerical_method
+
     def _update_extra_text(self, extra_text: list[str]) -> list[str]:
         instruments = self.model.instruments
         if instruments.shape[1] > 0:
