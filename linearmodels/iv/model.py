@@ -51,10 +51,10 @@ from scipy.optimize import minimize
 
 from linearmodels.iv._utility import (
     IVFormulaParser,
-    full_column_rank,
     kclass_factors,
     kclass_solve,
     orthonormal_basis,
+    rank_tests,
     resolve_method,
 )
 from linearmodels.iv.common import f_statistic, find_constant
@@ -528,7 +528,7 @@ class _IVModelBase:
         self._formula = value
 
     def _validate_inputs(self) -> None:
-        x, z = self._x, self._z
+        x = self._x
         if x.shape[1] == 0:
             raise ValueError("Model must contain at least one regressor.")
         if self.instruments.shape[1] < self.endog.shape[1]:
@@ -537,22 +537,34 @@ class _IVModelBase:
                 "as large as the number of endogenous regressors"
                 " ({}).".format(self.instruments.shape[1], self.endog.shape[1])
             )
+        # The weighted regressors and instruments are tested, since the estimates use
+        # them. They are x and z if the model has no weights or equal weights
         checks = (
-            (x, "regressors [exog endog] do not have full column rank"),
-            (z, "instruments [exog instruments]  do not have full column rank"),
+            (self._wx, "regressors [exog endog] do not have full column rank", False),
+            (
+                self._wz,
+                "instruments [exog instruments]  do not have full column rank",
+                self._supports_qr,
+            ),
         )
         # The error that fit raises for a method that cannot estimate the model. The
         # model is only rejected here if no method can estimate it
         self._rank_errors: dict[str, str] = {}
-        for a, message in checks:
+        # The orthonormal basis of the weighted instruments, which fit uses with
+        # method="qr". Its first columns are a basis of the weighted exog
+        self._qr_z_basis: linearmodels.typing.data.Float64Array | None = None
+        for a, message, keep_basis in checks:
             # "qr" tests the columns scaled to unit length, so not their units
-            qr_ok = self._supports_qr and full_column_rank(a, _RANK_TOLERANCE)
-            if matrix_rank(a) < a.shape[1]:
+            pinv_ok, qr_ok, basis = rank_tests(a, _RANK_TOLERANCE, basis=keep_basis)
+            qr_ok = qr_ok and self._supports_qr
+            if not pinv_ok:
                 if not qr_ok:
                     raise ValueError(message)
                 self._rank_errors.setdefault("pinv", message + "." + _SCALE_HINT)
-            elif self._supports_qr and not qr_ok:
+            elif not qr_ok and self._supports_qr:
                 self._rank_errors.setdefault("qr", f"{message}. {_RANK_MESSAGE}")
+            if keep_basis:
+                self._qr_z_basis = basis
         self._has_constant, self._const_loc = has_constant(x)
 
     # The k-class models can be estimated with method="qr"
@@ -731,16 +743,19 @@ class _IVModelBase:
         qr_method = method == "qr"
         # x1 is z without endogenous regressors and instruments, as in OLS
         same = x1.shape == z.shape and array_equal(x1, z)
-        # The residuals on x1 are computed before z is decomposed, so that the two
+        # With "qr", the basis of z from the rank check. x1 is the first columns of z,
+        # so that the first columns of the basis are a basis of x1. With "pinv", the
+        # residuals on x1 are computed before z is decomposed, so that the two
         # decompositions are not in memory at the same time
+        z_basis = cast("linearmodels.typing.data.Float64Array", self._qr_z_basis)
         ex1 = e
         if x1.shape[1] > 0 and not same:
             if qr_method:
-                ex1 = _residuals(e, orthonormal_basis(x1))
+                ex1 = _residuals(e, z_basis[:, : x1.shape[1]])
             else:
                 ex1 = e - x1 @ (pinv(x1) @ e)
         if qr_method:
-            z_dec = orthonormal_basis(z)
+            z_dec = z_basis
             ez = _residuals(e, z_dec)
         else:
             z_dec = pinv(z)
@@ -1091,8 +1106,8 @@ class _IVLSModelBase(_IVModelBase):
         self._check_clusters(cov_config)
         wy, wx, wz = self._wy, self._wx, self._wz
         kappa = self._kappa
-        # One decomposition of the instruments, by _estimate_kappa, for kappa, the
-        # estimate and the covariance
+        # One decomposition of the instruments for kappa, the estimate and the
+        # covariance: by _estimate_kappa with "pinv", and from the rank check with "qr"
         z_dec: linearmodels.typing.data.Float64Array | None = None
         try:
             liml_kappa, z_dec = self._estimate_kappa(method)
@@ -1115,7 +1130,8 @@ class _IVLSModelBase(_IVModelBase):
 
         reuse: dict[str, Any]
         if method == "qr":
-            z_basis = orthonormal_basis(wz) if z_dec is None else z_dec
+            # The basis of the weighted instruments from the rank check
+            z_basis = cast("linearmodels.typing.data.Float64Array", self._qr_z_basis)
             factors = kclass_factors(wx, z_basis, float(est_kappa), wy)
             params = kclass_solve(factors)
             reuse = {"z_basis": z_basis, "factors": factors}
@@ -1453,7 +1469,8 @@ class IV2SLS(_IVLSModelBase):
     and none at c = 1e8. It also tests the rank of the columns as they are, so it
     rejects columns on very different scales and accepts nearly collinear ones, such
     as a variable and its square. ``"pinv"`` is the default until linearmodels 8.0,
-    when the default becomes ``"qr"``.
+    when the default becomes ``"qr"``. With ``weights``, both methods test the
+    weighted columns, which the estimates use.
 
     .. versionadded:: 7.2
 

@@ -39,6 +39,10 @@ be added to 7.1. 7.2 also contains the fixes below.
   variables imply, such as dummies that sum to one in a model without a constant. 7.1
   also tested the implied intercept, with one more degree of freedom (:issue:`780`,
   :issue:`859`, :issue:`866`).
+- With ``weights``, the IV models test the rank of the weighted regressors and
+  instruments, which the estimates use. 7.1 tested the unweighted ones, whose condition
+  number can differ greatly, so that a model whose weighted instruments are nearly
+  collinear was accepted (:issue:`873`).
 
 .. rubric:: Backward-incompatible changes
 

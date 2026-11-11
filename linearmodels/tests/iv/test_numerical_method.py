@@ -277,6 +277,45 @@ def test_unscaled_rank_check_depends_on_the_units():
     mod.fit(method="qr")
 
 
+def weighted_collinear_data():
+    # Two instruments that are equal up to 1e-11 on the rows with most of the weight,
+    # and differ on the others. The condition number of the scaled instruments is 2.5,
+    # and 4.1e9 with the weights
+    rng = np.random.default_rng(0)
+    nobs, heavy = 1000, np.arange(1000) < 50
+    z1 = rng.standard_normal(nobs)
+    z2 = z1 + np.where(heavy, 1e-11, 1.0) * rng.standard_normal(nobs)
+    endog = z1 + z2 + rng.standard_normal(nobs)
+    y = 1 + endog + rng.standard_normal(nobs)
+    weights = np.where(heavy, 1.0, 1e-20)
+    return (y, np.ones((nobs, 1)), endog, np.c_[z1, z2]), weights
+
+
+def test_rank_check_uses_the_weighted_columns():
+    data, weights = weighted_collinear_data()
+    IV2SLS(*data).fit(method="qr")
+    mod = IV2SLS(*data, weights=weights)
+    with pytest.raises(ValueError, match=r"instruments .* collinear"):
+        mod.fit(method="qr")
+    mod.fit(method="pinv")
+
+
+def test_qr_uses_the_basis_of_the_weighted_instruments():
+    y, exog, endog, instr = scaled_data()
+    weights = np.random.default_rng(2).uniform(0.1, 10.0, y.shape[0])
+    mod = IV2SLS(y, exog, endog, instr, weights=weights)
+    basis = mod._qr_z_basis
+    assert_allclose(basis.T @ basis, np.eye(basis.shape[1]), atol=1e-14)
+    assert_allclose(basis @ (basis.T @ mod._wz), mod._wz, rtol=1e-12, atol=1e-12)
+    res = mod.fit(cov_type="unadjusted", method="qr")
+    # The estimate from a new decomposition of the weighted instruments
+    expected = IV2SLS.estimate_parameters(mod._wx, mod._wy, mod._wz, 1.0, method="qr")
+    assert_allclose(res.params.to_numpy(), expected.ravel(), rtol=1e-12)
+    pinv = mod.fit(cov_type="unadjusted", method="pinv")
+    assert_allclose(res.params, pinv.params, rtol=1e-10)
+    assert_allclose(res.cov, pinv.cov, rtol=1e-9)
+
+
 def test_default_is_pinv():
     data = scaled_data()
     for model in (IV2SLS, IVLIML):
@@ -480,6 +519,19 @@ def test_kappa_with_two_endogenous_regressors_does_not_depend_on_the_units(scale
     y = y * scales[0]
     endog = endog * np.array(scales[1:])
     res = IVLIML(y, exog, endog, instr).fit(method="qr")
+    assert_allclose(res.kappa, expected, rtol=1e-10)
+
+
+def test_kappa_with_weights():
+    # The basis of the weighted exog is the first columns of the basis of the weighted
+    # instruments
+    y, exog, endog, instr = scaled_data()
+    weights = np.random.default_rng(3).uniform(0.1, 10.0, y.shape[0])
+    root = np.sqrt(weights / weights.mean())
+    expected = reference_kappa(
+        y * root, exog * root[:, None], endog * root[:, None], instr * root[:, None]
+    )
+    res = IVLIML(y, exog, endog, instr, weights=weights).fit(method="qr")
     assert_allclose(res.kappa, expected, rtol=1e-10)
 
 
