@@ -17,10 +17,11 @@ from scipy import stats
 from statsmodels.iolib.summary import SimpleTable, fmt_2cols, fmt_params
 
 from linearmodels.iv.results import default_txt_fmt, stub_concat, table_concat
-from linearmodels.panel.covariance import HomoskedasticCovariance
+from linearmodels.panel.covariance import ClusteredCovariance, HomoskedasticCovariance
 from linearmodels.panel.data import PanelDataLike
 from linearmodels.shared.alignment import same_labels
 from linearmodels.shared.base import _ModelComparison, _SummaryStr
+from linearmodels.shared.exceptions import NegativeVarianceWarning
 from linearmodels.shared.hypotheses import (
     InapplicableTestStatistic,
     InvalidTestStatistic,
@@ -97,14 +98,19 @@ class PanelResults(_SummaryStr):
     @cached_property
     def cov(self) -> DataFrame:
         """Estimated covariance of parameters."""
-        return DataFrame(
+        cov = DataFrame(
             self._deferred_cov(), columns=self._var_names, index=self._var_names
         )
+        _warn_negative_variance(self, cov)
+        return cov
 
     @property
     def std_errors(self) -> Series:
         """Estimated parameter standard errors."""
-        return Series(np.sqrt(np.diag(self.cov)), self._var_names, name="std_error")
+        # A negative variance has already been reported by cov
+        with np.errstate(invalid="ignore"):
+            std_errors = np.sqrt(np.diag(self.cov))
+        return Series(std_errors, self._var_names, name="std_error")
 
     @property
     def tstats(self) -> Series:
@@ -1296,6 +1302,32 @@ class PanelEffectsResults(PanelResults):
         vals = [self._sigma2_effects, self._sigma2_eps, self._rho]
         index = ["Effects", "Residual", "Percent due to Effects"]
         return Series(vals, index=index, name="Variance Decomposition")
+
+
+def _warn_negative_variance(res: PanelResults, cov: DataFrame) -> None:
+    """Warn if the estimated variance of a parameter is negative"""
+    negative = np.diag(cov) < 0
+    if not np.any(negative):
+        return
+    names = [str(name) for name in cov.index[negative]]
+    if len(names) == 1:
+        msg = (
+            f"The estimated variance of {names[0]} is negative, so its standard "
+            "error, t-statistic and p-value are NaN."
+        )
+    else:
+        msg = (
+            f"The estimated variances of {', '.join(names)} are negative, so their "
+            "standard errors, t-statistics and p-values are NaN."
+        )
+    estimator = getattr(res._deferred_cov, "__self__", None)
+    if isinstance(estimator, ClusteredCovariance) and estimator._clusters.ndim == 2:
+        msg += (
+            " The two-way clustered covariance is not guaranteed to be positive "
+            "semi-definite. Fit with fix_psd=True to set its negative eigenvalues "
+            "to zero (Cameron, Gelbach and Miller, 2011)."
+        )
+    warnings.warn(msg, NegativeVarianceWarning, stacklevel=4)
 
 
 def _has_unadjusted_cov(res: PanelResults) -> bool:
