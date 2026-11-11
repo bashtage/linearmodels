@@ -19,7 +19,7 @@
     
   
       
-        <title>linearmodels.iv.covariance - linearmodels v7.2 (+67)</title>
+        <title>linearmodels.iv.covariance - linearmodels v7.2 (+69)</title>
       
     
 
@@ -91,7 +91,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../../index.html" title="linearmodels v7.2 (+67)" class="md-header__button md-logo" aria-label="linearmodels v7.2 (+67)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.2 (+69)" class="md-header__button md-logo" aria-label="linearmodels v7.2 (+69)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -102,7 +102,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            linearmodels v7.2 (+67)
+            linearmodels v7.2 (+69)
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -197,10 +197,10 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../../index.html" title="linearmodels v7.2 (+67)" class="md-nav__button md-logo" aria-label="linearmodels v7.2 (+67)" data-md-component="logo">
+    <a href="../../../index.html" title="linearmodels v7.2 (+69)" class="md-nav__button md-logo" aria-label="linearmodels v7.2 (+69)" data-md-component="logo">
       <img src="../../../_static/bw-logo.svg" alt="logo">
     </a>
-    linearmodels v7.2 (+67)
+    linearmodels v7.2 (+69)
   </label>
   
     <div class="md-nav__source">
@@ -1081,7 +1081,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_numerical_method</span> <span class="o">=</span> <span class="n">resolve_method</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">)</span>
         <span class="c1"># Decompositions of z and products with it, computed when first used or given</span>
         <span class="c1"># by the model, see _reuse</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_pinvz</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_pinvz_x</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_xpz_pinvz_x</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_z_basis</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
@@ -1111,7 +1110,6 @@
     <span class="k">def</span><span class="w"> </span><span class="nf">_reuse</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
-        <span class="n">pinvz</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">pinvz_x</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">xpz_pinvz_x</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">z_basis</span><span class="p">:</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -1120,22 +1118,16 @@
 <span class="w">        </span><span class="sd">"""</span>
 <span class="sd">        Use what the model computed from the same x, z and kappa.</span>
 
-<span class="sd">        With method="pinv", pinv(z), pinv(z) @ x and x'z @ pinv(z) @ x. With "qr",</span>
-<span class="sd">        the orthonormal basis of z and the factors of the k-class estimator.</span>
+<span class="sd">        With method="pinv", pinv(z) @ x and x'z @ pinv(z) @ x. With "qr", the</span>
+<span class="sd">        orthonormal basis of z and the factors of the k-class estimator.</span>
 <span class="sd">        """</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_pinvz</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pinvz_x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_xpz_pinvz_x</span> <span class="o">=</span> <span class="n">pinvz</span><span class="p">,</span> <span class="n">pinvz_x</span><span class="p">,</span> <span class="n">xpz_pinvz_x</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pinvz_x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_xpz_pinvz_x</span> <span class="o">=</span> <span class="n">pinvz_x</span><span class="p">,</span> <span class="n">xpz_pinvz_x</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_z_basis</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_factors</span> <span class="o">=</span> <span class="n">z_basis</span><span class="p">,</span> <span class="n">factors</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">_pinv_z</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">"""pinv(z), used with method="pinv", computed once."""</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pinvz</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_pinvz</span> <span class="o">=</span> <span class="n">pinv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">z</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pinvz</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_pinv_z_x</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">"""pinv(z) @ x, used with method="pinv", computed once."""</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pinvz_x</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_pinvz_x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pinv_z</span><span class="p">()</span> <span class="o">@</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_pinvz_x</span> <span class="o">=</span> <span class="n">pinv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">z</span><span class="p">)</span> <span class="o">@</span> <span class="bp">self</span><span class="o">.</span><span class="n">x</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pinvz_x</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_basis</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">linearmodels</span><span class="o">.</span><span class="n">typing</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Float64Array</span><span class="p">:</span>
