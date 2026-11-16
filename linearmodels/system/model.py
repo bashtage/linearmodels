@@ -43,7 +43,7 @@ from linearmodels.shared.exceptions import (
 )
 from linearmodels.shared.hypotheses import InvalidTestStatistic, WaldTestStatistic
 from linearmodels.shared.inputs import as_array_like, as_float64
-from linearmodels.shared.linalg import has_constant
+from linearmodels.shared.linalg import _implicit_constant_restriction, has_constant
 from linearmodels.shared.rsquared import r_squared, total_ss_is_zero
 from linearmodels.shared.utility import AttrDict
 from linearmodels.shared.weights import check_weights, normalize_weights
@@ -1048,15 +1048,23 @@ class _SystemModelBase:
         return self._has_constant
 
     def _f_stat(
-        self, stats: AttrDict, debiased: bool
+        self,
+        stats: AttrDict,
+        x: linearmodels.typing.data.Float64Array,
+        debiased: bool,
     ) -> WaldTestStatistic | InvalidTestStatistic:
+        params = stats.params
         cov = stats.cov
-        k = cov.shape[0]
-        sel = list(range(k))
         if stats.has_constant:
-            sel.pop(stats.constant_loc)
-        cov = cov[sel][:, sel]
-        params = stats.params[sel]
+            if np.ptp(x[:, stats.constant_loc]) == 0:
+                sel = list(range(cov.shape[0]))
+                sel.pop(stats.constant_loc)
+                params = params[sel]
+                cov = cov[sel][:, sel]
+            else:
+                restriction = _implicit_constant_restriction(x)
+                params = restriction @ params
+                cov = restriction @ cov @ restriction.T
         df = params.shape[0]
         nobs = stats.nobs
         null = "All parameters ex. constant are zero"
@@ -1168,7 +1176,7 @@ class _SystemModelBase:
         stats["param_names"] = [n[offset:] for n in names]
 
         # F-statistic
-        stats["f_stat"] = self._f_stat(stats, debiased)
+        stats["f_stat"] = self._f_stat(stats, self._x[i], debiased)
 
         return stats
 

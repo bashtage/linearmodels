@@ -78,7 +78,7 @@ from linearmodels.shared.hypotheses import (
     WaldTestStatistic,
 )
 from linearmodels.shared.inputs import as_array_like, as_float64
-from linearmodels.shared.linalg import has_constant
+from linearmodels.shared.linalg import _implicit_constant_restriction, has_constant
 from linearmodels.shared.rsquared import r_squared, total_ss_is_zero
 from linearmodels.shared.typed_getters import get_panel_data_like
 from linearmodels.shared.utility import AttrDict, ensure_unique_column, panel_to_frame
@@ -178,16 +178,34 @@ class FInfo(NamedTuple):  # numpydoc ignore=PR02
         The test statistic to return if the test cannot be computed, or None.
     is_invalid : bool
         Flag indicating that the test cannot be computed.
+    restriction : ndarray or None, optional
+        Matrix of Wald restrictions if the regressors jointly span a constant.
+        Otherwise the Boolean array selects the parameters directly.
     """
 
     sel: linearmodels.typing.data.BoolArray
     name: str
     invalid_test_stat: InvalidTestStatistic | None
     is_invalid: bool
+    restriction: linearmodels.typing.data.Float64Array | None = None
 
 
 # The model fits exactly, e.g., the dependent variable is all zero
 _SINGULAR_COVARIANCE = "The covariance of the parameters is singular"
+
+
+def _f_test_data(
+    params: Series, cov: DataFrame, f_info: FInfo
+) -> tuple[
+    linearmodels.typing.data.Float64Array, linearmodels.typing.data.Float64Array
+]:
+    values = np.asarray(params)
+    covariance = np.asarray(cov)
+    restriction = f_info.restriction
+    if restriction is not None:
+        return restriction @ values, restriction @ covariance @ restriction.T
+    sel = f_info.sel
+    return values[sel], covariance[sel][:, sel]
 
 
 def _hotelling_f(
@@ -212,9 +230,9 @@ def _hotelling_f(
     if f_info.is_invalid:
         assert f_info.invalid_test_stat is not None
         return f_info.invalid_test_stat
-    sel = f_info.sel
     name = f_info.name
-    df = int(sel.sum())
+    restriction = f_info.restriction
+    df = int(f_info.sel.sum()) if restriction is None else restriction.shape[0]
     null = "All parameters ex. constant are zero"
     if nperiod <= df:
         reason = (
@@ -223,8 +241,7 @@ def _hotelling_f(
             f"so that their covariance has rank at most {nperiod - 1}."
         )
         return InvalidTestStatistic(reason, name=name)
-    test_params = np.asarray(params)[sel]
-    test_cov = np.asarray(cov)[sel][:, sel]
+    test_params, test_cov = _f_test_data(params, cov, f_info)
     try:
         inv_test_cov = np.linalg.inv(test_cov)
     except np.linalg.LinAlgError:
@@ -246,17 +263,14 @@ def _deferred_f(
     if f_info.is_invalid:
         assert f_info.invalid_test_stat is not None
         return f_info.invalid_test_stat
-    sel = f_info.sel
     name = f_info.name
-    test_params = np.asarray(params)[sel]
-    test_cov = np.asarray(cov)[sel][:, sel]
+    test_params, test_cov = _f_test_data(params, cov, f_info)
     try:
         inv_test_cov = np.linalg.inv(test_cov)
     except np.linalg.LinAlgError:
         return InvalidTestStatistic(_SINGULAR_COVARIANCE, name=name)
-    test_stat = test_params.T @ inv_test_cov @ test_params
-    test_stat = float(test_stat)
-    df = int(sel.sum())
+    test_stat = float(test_params.T @ inv_test_cov @ test_params)
+    df = test_params.shape[0]
     null = "All parameters ex. constant are zero"
 
     if debiased:
@@ -1257,6 +1271,8 @@ class _PanelModelBase:
         y: linearmodels.typing.data.Float64Array,
         x: linearmodels.typing.data.Float64Array,
         df_resid: int,
+        *,
+        transformed_constant: linearmodels.typing.data.Float64Array | None = None,
     ) -> WaldTestStatistic | InvalidTestStatistic:
         """Compute model F-statistic"""
         weps_const = y
@@ -1274,7 +1290,9 @@ class _PanelModelBase:
 
             num_df -= 1
             # The restricted model only has the transformed constant
-            const = x @ self._constant_loadings()
+            const = transformed_constant
+            if const is None:
+                const = x @ self._constant_loadings()
             mean = float(np.squeeze((const.T @ y) / (const.T @ const)))
             weps_const = cast("linearmodels.typing.data.Float64Array", y - const * mean)
 
@@ -1293,10 +1311,12 @@ class _PanelModelBase:
 
     def _f_statistic_robust(
         self,
-        params: linearmodels.typing.data.Float64Array,
+        x: linearmodels.typing.data.Float64Array,
+        *,
+        transformed_constant: linearmodels.typing.data.Float64Array | None = None,
     ) -> FInfo:
         """Compute Wald test that all parameters are 0, ex. constant"""
-        sel = np.ones(params.shape[0], dtype=bool)
+        sel = np.ones(x.shape[1], dtype=bool)
         name = "Model F-statistic (robust)"
 
         if len(sel) == 0:
@@ -1315,6 +1335,15 @@ class _PanelModelBase:
                     True,
                 )
             assert isinstance(self._constant_index, int)
+            exog = self.exog.values2d
+            if np.ptp(exog[:, self._constant_index]) != 0:
+                if transformed_constant is None:
+                    restriction = _implicit_constant_restriction(exog)
+                else:
+                    restriction = _implicit_constant_restriction(
+                        x, transformed_constant
+                    )
+                return FInfo(sel, name, None, False, restriction)
             sel[self._constant_index] = False
 
         return FInfo(sel, name, None, False)
@@ -1446,6 +1475,8 @@ class _PanelModelBase:
         y: linearmodels.typing.data.Float64Array,
         x: linearmodels.typing.data.Float64Array,
         weights: linearmodels.typing.data.Float64Array | None = None,
+        *,
+        transformed_constant: linearmodels.typing.data.Float64Array | None = None,
     ) -> AttrDict:
         """
         Common post-estimation values
@@ -1456,8 +1487,10 @@ class _PanelModelBase:
         is ``weights``, the weight of each of the observations of the regression.
         There are no weights, or unit weights, if ``weights`` is None.
         """
-        f_info = self._f_statistic_robust(params)
-        f_stat = self._f_statistic(weps, y, x, df_resid)
+        f_info = self._f_statistic_robust(x, transformed_constant=transformed_constant)
+        f_stat = self._f_statistic(
+            weps, y, x, df_resid, transformed_constant=transformed_constant
+        )
         r2o, r2w, r2b = self._rsquared(params)
         c2o, c2w, c2b = self._rsquared_corr(params)
         f_pooled = InapplicableTestStatistic(
@@ -3478,7 +3511,15 @@ class PanelOLS(_PanelModelBase):
         r2_ex_effects = r_squared(resid_ss, total_ss_ex_effect, y_ss, nobs)
 
         res = self._postestimation(
-            params, cov, debiased, df_resid, weps, y, x, weights=self.weights.values2d
+            params,
+            cov,
+            debiased,
+            df_resid,
+            weps,
+            y,
+            x,
+            weights=self.weights.values2d,
+            transformed_constant=root_w if self.has_constant else None,
         )
         ######################################
         # Pooled f-stat

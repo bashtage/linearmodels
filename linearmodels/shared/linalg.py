@@ -94,6 +94,21 @@ def has_constant(x: Float64Array, x_rank: int | None = None) -> tuple[bool, int]
     return True, int(np.argmin(normed_var))
 
 
+def _implicit_constant_restriction(
+    x: Float64Array, constant: Float64Array | None = None
+) -> Float64Array:
+    """Find Wald restrictions that leave only the implied intercept under the null."""
+    if constant is None:
+        constant = np.ones((x.shape[0], 1))
+    scale = np.abs(x).max(axis=0)
+    scale[scale == 0] = 1
+    # In scaled coefficient space the null is the direction that produces the
+    # constant. Map its orthogonal complement back to the original coefficients.
+    intercept = np.linalg.pinv(x / scale) @ constant
+    basis, _ = np.linalg.qr(intercept, mode="complete")
+    return basis[:, 1:].T * scale
+
+
 def inv_sqrth(x: Float64Array) -> Float64Array:
     """
     Matrix inverse square root.
