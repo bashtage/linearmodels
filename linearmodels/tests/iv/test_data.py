@@ -324,3 +324,33 @@ def test_categorical_missing_values_in_a_model() -> None:
     assert res.nobs == keep.sum()
     assert list(res.params.index) == ["const", "x", "g.b", "g.c"]
     assert_allclose(res.params, expected, rtol=1e-10)
+
+
+@pytest.mark.parametrize("dtype", ["object", "str", "string"])
+@pytest.mark.parametrize("drop_first", [True, False])
+def test_strings_with_missing_values_match_categoricals(
+    dtype: str, drop_first: bool
+) -> None:
+    values = pd.Series(["US", "UK", None, "US"], dtype=dtype, name="country")
+    original = values.copy()
+    data = IVData(values, drop_first=drop_first)
+    expected = IVData(values.astype("category"), drop_first=drop_first)
+    assert_frame_equal(data.pandas, expected.pandas)
+    assert_equal(data.isnull.to_numpy(), [False, False, True, False])
+    assert_series_equal(values, original)
+
+
+def test_string_missing_values_in_a_model() -> None:
+    frame = pd.DataFrame(
+        {
+            "country": ["US", "UK", None, "US", "UK", "US"],
+            "constant": 1.0,
+        }
+    )
+    y = pd.Series([1.0, 2.0, 100.0, 2.0, 3.0, 4.0])
+    with pytest.warns(MissingValueWarning):
+        result = IV2SLS(y, frame, None, None).fit()
+    observed = frame["country"].notna()
+    expected = IV2SLS(y[observed], frame.loc[observed], None, None).fit()
+    assert result.nobs == 5
+    assert_series_equal(result.params, expected.params)
