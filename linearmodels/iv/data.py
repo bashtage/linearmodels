@@ -169,7 +169,8 @@ class IVData:
                 c = x[col]
                 if (
                     is_string_dtype(c.dtype)
-                    and c.map(lambda v: isinstance(v, str)).all()
+                    and c.notna().any()
+                    and c.dropna().map(lambda v: isinstance(v, str)).all()
                 ):
                     c = c.astype("category")
                     if not copied:
