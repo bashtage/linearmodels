@@ -170,7 +170,7 @@ class IVData:
                 if (
                     is_string_dtype(c.dtype)
                     and c.notna().any()
-                    and c.dropna().map(lambda v: isinstance(v, str)).all()
+                    and c.map(lambda v: isinstance(v, str), na_action="ignore").all()
                 ):
                     c = c.astype("category")
                     if not copied:
