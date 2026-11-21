@@ -4907,7 +4907,9 @@ class RandomEffects(_PanelModelBase):
         with the others in the means of the entities (the year dummies and the
         constant in a balanced panel) is not in the between regression. A
         ``ValueError`` is raised if either regression has no residual degrees of
-        freedom, since the variances cannot be estimated.
+        freedom, since the variances cannot be estimated. If both estimated
+        variances are zero, the fit is pooled least squares, with theta and the
+        reported share of variance due to effects both set to zero.
 
         .. versionchanged:: 7.1
 
@@ -5048,9 +5050,14 @@ class RandomEffects(_PanelModelBase):
         else:
             t_bar = neffects / ((1.0 / t).sum())
             sigma2_u = max(0, ssr / df_between - sigma2_e / t_bar)
-        rho = sigma2_u / (sigma2_u + sigma2_e)
-
-        theta = 1.0 - np.sqrt(sigma2_e / (t * sigma2_u + sigma2_e))
+        if sigma2_u == 0 and sigma2_e == 0:
+            # With no variation in the errors, use pooled least squares. This also
+            # follows the PanelOLS convention for the share of a zero variance.
+            rho = 0.0
+            theta = np.zeros_like(t, dtype=float)
+        else:
+            rho = sigma2_u / (sigma2_u + sigma2_e)
+            theta = 1.0 - np.sqrt(sigma2_e / (t * sigma2_u + sigma2_e))
         theta_out = DataFrame(theta, columns=["theta"], index=wybar.index)
         wy: linearmodels.typing.data.Float64Array = np.asarray(
             root_w * self.dependent.values2d, dtype=float
