@@ -3,15 +3,16 @@ Core covariance estimators that the models share.
 """
 
 from numpy import (
+    add,
     any as npany,
     arange,
     argsort,
     cumsum,
+    float64,
     lexsort,
     r_,
     unique,
     where,
-    zeros,
 )
 from pandas import isnull
 
@@ -104,27 +105,16 @@ def cov_cluster(
     """
     if isnull(clusters).any():
         raise ValueError("clusters cannot contain missing values.")
-    num_clusters = len(unique(clusters))
-    if num_clusters < 2:
+    sort_args = argsort(clusters)
+    clusters = clusters[sort_args]
+    starts = where(r_[True, clusters[:-1] != clusters[1:]])[0]
+    if len(starts) < 2:
         raise ValueError(
             "A clustered covariance requires at least two clusters, but clusters "
             "has one group."
         )
-
-    sort_args = argsort(clusters)
-    clusters = clusters[sort_args]
-    locs = where(r_[True, clusters[:-1] != clusters[1:], True])[0]
-    z = z[sort_args]
-    n, k = z.shape
-    s = zeros((k, k))
-
-    for i in range(num_clusters):
-        st, en = locs[i], locs[i + 1]
-        z_bar = z[st:en].sum(axis=0)[:, None]
-        s += z_bar @ z_bar.T
-
-    s /= n
-    return s
+    group_sums = add.reduceat(z[sort_args], starts, axis=0, dtype=float64)
+    return (group_sums.T @ group_sums) / z.shape[0]
 
 
 def cov_kernel(
