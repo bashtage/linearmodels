@@ -126,6 +126,21 @@ def test_constant_dependent_variable_panel(name, value):
     assert_summary_has(res, "R-squared")
 
 
+@pytest.mark.parametrize("small_sample", [False, True])
+def test_random_effects_zero_variance_components(small_sample):
+    _, _, xc = panel_data()
+    xc = xc.iloc[:-1]
+    y = pd.Series(0.0, index=xc.index)
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        res = RandomEffects(y, xc).fit(small_sample=small_sample)
+        assert_nan(res, PANEL_MEASURES)
+        assert_allclose(res.params, 0.0)
+        assert_allclose(res.cov, 0.0)
+        assert_allclose(res.theta, 0.0)
+        assert_allclose(res.variance_decomposition, 0.0)
+
+
 @pytest.mark.parametrize("name", PANEL_WITH_CONSTANT)
 def test_constant_dependent_variable_weighted_and_unbalanced_panel(name):
     index, _, xc = panel_data(seed=1)
