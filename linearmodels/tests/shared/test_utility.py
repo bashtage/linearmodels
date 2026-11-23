@@ -394,12 +394,15 @@ def test_add_star(pvalue):
     assert expected == result
 
 
-def test_cov_cluster():
+@pytest.mark.parametrize("singleton", [False, True])
+def test_cov_cluster(singleton):
     rng = np.random.default_rng(0)
     z = rng.standard_normal((60, 3))
     clusters = np.arange(60) % 7
+    if singleton:
+        clusters[0] = 7
     expected = np.zeros((3, 3))
-    for group in range(7):
+    for group in np.unique(clusters):
         total = z[clusters == group].sum(0)
         expected += np.outer(total, total)
     assert_allclose(cov_cluster(z, clusters), expected / 60)
