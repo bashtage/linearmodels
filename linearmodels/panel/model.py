@@ -627,6 +627,15 @@ class _PanelModelBase:
         self._labels_name = "dependent"
         self._check_labels("dependent", self.dependent.index, _is_labelled(dependent))
         self._check_labels("exog", self.exog.index, _is_labelled(exog))
+        # Positional inputs must use dependent's groups for transformations and
+        # weight shapes. Leave unequal row counts to the existing validation.
+        if self.exog.dataframe.shape[0] == self.dependent.dataframe.shape[
+            0
+        ] and not self.exog.index.equals(self.dependent.index):
+            self.exog = PanelData(
+                self.exog.dataframe.set_axis(self.dependent.index),
+                convert_dummies=False,
+            )
         self._original_shape = self.dependent.shape
         # The rows of dependent, before the observations with missing values are
         # dropped. The inputs that are given for each time period and entity are
@@ -1179,6 +1188,14 @@ class _PanelModelBase:
         if y.shape[0] != w.shape[0]:
             raise ValueError(
                 "weights must have the same number of observations as dependent."
+            )
+
+        # Weights can carry labels when dependent has none. After validation,
+        # use dependent's groups for their means and differences as well.
+        if not self.weights.index.equals(self.dependent.index):
+            self.weights = PanelData(
+                self.weights.dataframe.set_axis(self.dependent.index),
+                convert_dummies=False,
             )
 
         # The rows that are missing in dependent and in all of the regressors are
