@@ -20,7 +20,8 @@ be added to 7.1. 7.2 also contains the fixes below.
   the scaled data, about 16 - log10(c) digits are correct, against 16 - 2 log10(c) with
   ``method="pinv"``. With nearly collinear regressors (c of about 1e6), the median error
   of the 2SLS estimates and their robust standard errors falls from about 5e-4 to 4e-11
-  in simulations. ``method="pinv"``, the default, gives the same results as 7.1. The IV
+  in simulations. ``method="pinv"``, the default, gives the same results as 7.1, except
+  for the kappa of LIML in the cases of issue 823 below. The IV
   covariance estimators, ``estimate_parameters``, ``cragg_donald``, ``cragg_donald_f``,
   ``kleibergen_paap``, ``kleibergen_paap_f`` and ``FirstStageResults`` take the same
   keyword. ``IVGMM``, ``IVGMMCUE`` and ``IVJIVE`` do not, since they are not k-class
@@ -43,6 +44,13 @@ be added to 7.1. 7.2 also contains the fixes below.
   instruments, which the estimates use. 7.1 tested the unweighted ones, whose condition
   number can differ greatly, so that a model whose weighted instruments are nearly
   collinear was accepted (:issue:`873`).
+- The kappa of LIML is computed from residuals scaled to have columns of unit length,
+  so that it does not depend on the units of the variables. 7.1 computed it from the
+  residuals as they were, so that with 2 or more endogenous regressors it changed by
+  up to about 2.6e-4 in relative terms when a variable was rescaled. An endogenous
+  regressor that is (numerically) a linear combination of the exogenous regressors
+  and instruments is now detected, and ``fit`` raises a ``ValueError`` if ``kappa``
+  is not provided; 7.1 returned the rounding error as kappa (:issue:`823`).
 
 .. rubric:: Backward-incompatible changes
 
