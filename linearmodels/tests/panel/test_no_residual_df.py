@@ -21,6 +21,7 @@ from linearmodels.panel import (
     PanelOLS,
     PooledOLS,
 )
+from linearmodels.panel.covariance import FamaMacBethCovariance
 from linearmodels.shared.exceptions import InferenceUnavailableWarning
 from linearmodels.shared.hypotheses import (
     InapplicableTestStatistic,
@@ -149,3 +150,60 @@ def test_single_period_with_time_effects(const):
     res = PanelOLS(y, x, time_effects=True).fit()
     assert isinstance(res.f_pooled, InapplicableTestStatistic)
     assert np.all(np.isfinite(res.params))
+
+
+@pytest.mark.parametrize("cov_type", ["unadjusted", "robust", "kernel"])
+def test_famamacbeth_single_period_raises_value_error(cov_type):
+    y, x = single_period(const=True)
+    with pytest.warns(InferenceUnavailableWarning):
+        mod = FamaMacBeth(y, x)
+    with pytest.raises(ValueError, match=NO_DF) as exc_info:
+        mod.fit(cov_type=cov_type)
+    assert exc_info.type is ValueError
+
+
+def test_famamacbeth_single_period_zero_bandwidth_raises_value_error():
+    y, x = make_panel(8, 1, 1)
+    mod = FamaMacBeth(y, x)
+    with pytest.raises(ValueError, match=NO_DF):
+        mod.fit()
+    with pytest.raises(ValueError, match=NO_DF):
+        mod.fit(cov_type="kernel", bandwidth=0)
+
+
+def test_famamacbeth_dropped_to_single_period_raises_value_error():
+    y, x = make_panel(8, 2, 1)
+    x.insert(0, "const", 1.0)
+    period = x.index.get_level_values(1)
+    x.loc[period == 1, "x0"] = 1.5
+    with pytest.warns(InferenceUnavailableWarning):
+        mod = FamaMacBeth(y, x)
+    with pytest.raises(ValueError, match=NO_DF):
+        mod.fit()
+
+
+def test_famamacbeth_single_period_not_debiased():
+    y, x = single_period(const=True)
+    with pytest.warns(InferenceUnavailableWarning):
+        mod = FamaMacBeth(y, x)
+    res = mod.fit(debiased=False)
+    assert np.all(np.isfinite(res.params))
+    np.testing.assert_allclose(res.cov, 0.0)
+    assert res.df_resid == 0
+    assert isinstance(res.f_statistic_robust, InvalidTestStatistic)
+    assert str(res.summary)
+
+    res_bw0 = mod.fit(cov_type="kernel", bandwidth=0, debiased=False)
+    np.testing.assert_allclose(res_bw0.cov, 0.0)
+
+
+def test_famamacbeth_covariance_requires_residual_df():
+    all_params = pd.DataFrame([[1.0, 2.0]], columns=["const", "x0"])
+    params = all_params.mean(axis=0).to_numpy()[:, None]
+    y, x = np.zeros((8, 1)), np.ones((8, 2))
+    with pytest.raises(ValueError, match=NO_DF):
+        FamaMacBethCovariance(y, x, params, all_params, debiased=True)
+    with pytest.raises(ValueError, match=NO_DF):
+        FamaMacBethCovariance(y, x, params, all_params, debiased=True, bandwidth=0)
+    cov = FamaMacBethCovariance(y, x, params, all_params, debiased=False, bandwidth=0)
+    np.testing.assert_allclose(cov.cov, 0.0)
