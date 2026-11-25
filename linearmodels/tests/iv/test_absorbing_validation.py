@@ -205,7 +205,12 @@ def test_cluster_message_names_only_what_the_models_have(data):
     z = pd.DataFrame(
         np.random.default_rng(2).standard_normal((NOBS, 2)), columns=["z0", "z1"]
     )
-    endog = (z.sum(axis=1) + x["x0"]).to_frame("e")
+    # Not exactly a combination of the instruments and the exogenous regressors:
+    # an endogenous regressor that is spanned by them has no kappa (issue 823),
+    # and fit raises before it reaches the covariance estimator
+    endog = (
+        z.sum(axis=1) + x["x0"] + 0.01 * np.random.default_rng(3).standard_normal(NOBS)
+    ).to_frame("e")
     with pytest.warns(MissingValueWarning, match="missing values"):
         models = {
             "IV2SLS": IV2SLS(y, x, endog, z),

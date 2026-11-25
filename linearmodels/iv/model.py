@@ -19,6 +19,7 @@ from numpy import (
     c_,
     column_stack,
     diag,
+    divide,
     dtype,
     eye,
     finfo,
@@ -33,6 +34,7 @@ from numpy import (
     sqrt,
     squeeze,
     unique,
+    zeros_like,
 )
 from numpy.linalg import (
     LinAlgError,
@@ -706,19 +708,22 @@ class _IVModelBase:
             This occurs if there are fewer than 1 + the number of endogenous
             regressors observations more than the number of exogenous regressors and
             instruments, and if the columns of the residuals are collinear, to
-            rounding error, or a column is 0, for another reason.
+            rounding error, or a column is 0, for another reason. It is also raised
+            if a column of the residuals is only rounding error relative to the
+            residuals on the exogenous regressors, so that the dependent variable
+            or an endogenous regressor is (numerically) a linear combination of
+            the exogenous regressors and instruments, see issue 823.
 
         Notes
         -----
         Whether the residuals are linearly dependent does not depend on the units of
         the variables: the count of observations does not, and the rank is tested on
-        residuals that are scaled to have columns of unit length. Kappa is computed
-        from the residuals as they are. Two cases are not covered, see issue 823. With
-        method="pinv", the accuracy of kappa depends on the units of the variables if
-        there are 2 or more endogenous regressors. With either method, a regressor
-        that is exactly a linear combination of the exogenous regressors and
-        instruments, which has residuals that are only rounding error, is not
-        detected.
+        residuals that are scaled to have columns of unit length. With
+        method="pinv", kappa is computed from residuals scaled to have columns of
+        unit length, so that it does not depend on the units of the variables
+        either, see issue 823. A regressor that is exactly a linear combination of
+        the exogenous regressors and instruments is detected before the
+        computation, and kappa is not estimated.
         """
         y, x, z = self._wy, self._wx, self._wz
         is_exog = self._regressor_is_exog
@@ -763,11 +768,38 @@ class _IVModelBase:
         if same:
             ex1 = ez
 
+        # A column of the residuals on the exogenous regressors and instruments
+        # that is only rounding error, relative to the residuals on the
+        # exogenous regressors, is a dependent variable or an endogenous
+        # regressor that is (numerically) a linear combination of the
+        # exogenous regressors and instruments, see issue 823. Its kappa is
+        # rounding error, not the kappa of the data, so kappa is not
+        # estimated. The comparison is against the residuals on the exogenous
+        # regressors, so that a variable with a small coefficient of variation
+        # in a model without a constant is not flagged. A column whose
+        # residuals on the exogenous regressors are 0 is also 0 here, and is
+        # flagged, as it is by the rank test below
+        ez_norm = norm(ez, axis=0)
+        ex1_norm = norm(ex1, axis=0)
+        relative = divide(
+            ez_norm, ex1_norm, out=zeros_like(ez_norm), where=ex1_norm > 0
+        )
+        if npany(relative <= _KAPPA_TOLERANCE):
+            raise LinAlgError(
+                "The residuals of the dependent variable and the endogenous "
+                "regressors on the exogenous regressors and instruments are "
+                "rounding error relative to the residuals on the exogenous "
+                "regressors, so that an endogenous regressor (or the "
+                "dependent variable) is (numerically) a linear combination "
+                "of the exogenous regressors and instruments, and kappa "
+                "cannot be estimated."
+            )
+
         # The rank is tested on a copy of the residuals with columns of unit length, so
         # that it does not depend on the units of the variables. A column that is exactly
-        # 0 cannot be scaled, and is linearly dependent. Kappa is computed from the
-        # residuals as they are, see issue 823
-        scale = norm(ez, axis=0)
+        # 0 cannot be scaled, and is linearly dependent. The detection above guarantees
+        # that no column is 0 here
+        scale = ez_norm
         full_rank = False
         if npall(scale > 0):
             full_rank = bool(matrix_rank(ez / scale, tol=_KAPPA_TOLERANCE) == ncol)
@@ -787,8 +819,14 @@ class _IVModelBase:
             scaled_ex1 = solve_triangular(r, ex1.T, trans="T").T
             return float(svd(scaled_ex1, compute_uv=False)[-1] ** 2), z_dec
 
-        vpmzv_sqinv = inv_sqrth(ez.T @ ez)
-        q = vpmzv_sqinv @ (ex1.T @ ex1) @ vpmzv_sqinv
+        # Kappa is computed from residuals scaled to have columns of unit length, so
+        # that it does not depend on the units of the variables, see issue 823.
+        # Scaling the columns of the residuals is a congruence transformation of
+        # both cross products, so the generalized eigenvalues are unchanged
+        ez_scaled = ez / ez_norm
+        ex1_scaled = ex1 / ez_norm
+        vpmzv_sqinv = inv_sqrth(ez_scaled.T @ ez_scaled)
+        q = vpmzv_sqinv @ (ex1_scaled.T @ ex1_scaled) @ vpmzv_sqinv
         return min(eigvalsh(q)), z_dec
 
     def _post_estimation(
@@ -1250,11 +1288,14 @@ class IVLIML(_IVLSModelBase):
     results are an ``InvalidTestStatistic``, since they use the estimate of
     :math:`\kappa`.
 
-    Two cases are not covered, see :issue:`823`. An endogenous regressor that is
-    exactly a linear combination of the exogenous regressors and instruments has
-    residuals that are only rounding error, and so does :math:`\kappa`. With 2 or
-    more endogenous regressors, :math:`\kappa` loses accuracy, and the estimate can
-    fail, if the variables are on very different scales.
+    An endogenous regressor that is exactly a linear combination of the
+    exogenous regressors and instruments has residuals that are only rounding
+    error, relative to the residuals on the exogenous regressors, and so does
+    :math:`\kappa`: :math:`\kappa` is not defined then, and ``fit`` raises a
+    ``ValueError`` if ``kappa`` is not provided. With 2 or more endogenous
+    regressors, :math:`\kappa` is computed from residuals scaled to have columns
+    of unit length, so that it does not depend on the units of the variables,
+    see :issue:`823`.
 
     .. versionchanged:: 7.1
 
@@ -1263,6 +1304,13 @@ class IVLIML(_IVLSModelBase):
        instead of 1 in a just-identified model with 3 observations, a constant, one
        endogenous regressor and one instrument. It was NaN on some platforms, with
        the estimates and their covariance, and a ``RuntimeWarning`` was emitted.
+
+    .. versionchanged:: 7.2
+
+       A ``ValueError`` is raised if an endogenous regressor is (numerically) a
+       linear combination of the exogenous regressors and instruments, and
+       :math:`\kappa` is computed from residuals scaled to have columns of unit
+       length, so that it does not depend on the units of the variables.
 
     The ``method`` of ``fit`` is described in the Notes of :class:`IV2SLS`.
 

@@ -27,11 +27,13 @@ that use it are invalid, and not emit a warning, on every platform. Whether B is
 singular cannot depend on the units of the variables, and so a column of W that
 is rescaled by 1e6 or 1e-6 does not change whether kappa is defined.
 
-Where kappa is defined it is computed as it was. The accuracy of kappa depends on
-the units of the variables if there are 2 or more endogenous regressors, and a
-regressor that is exactly a linear combination of the exogenous regressors and
-instruments is not detected (issue 823). The tests pin the values, which are
-noise in the second case, to those of the previous computation.
+Where kappa is defined it is computed from residuals scaled to have columns of
+unit length, so that it does not depend on the units of the variables
+(issue 823). On designs without rescaling the values are the same as those of
+the previous computation, to rounding error. A regressor that is exactly a
+linear combination of the exogenous regressors and instruments is detected, and
+kappa is not estimated: its residuals are only rounding error, relative to the
+residuals on the exogenous regressors.
 
 The expected values are computed from the definition. The projections come from
 QR decompositions and kappa from scipy.linalg.eigh(A, B), so that none of the
@@ -348,22 +350,45 @@ def span_data(seed):
 
 
 @pytest.mark.parametrize("seed", range(8))
-def test_kappa_of_a_regressor_in_the_span_of_the_instruments_is_computed_as_before(
+def test_kappa_of_a_regressor_in_the_span_of_the_instruments_is_not_estimated(
     seed,
 ):
-    # The residuals of the regressor are rounding error, and so is kappa (issue 823),
-    # which is near 1. Dividing the residuals by their norms magnified the rounding
+    # The residuals of the regressor are rounding error, and so is kappa (issue 823).
+    # Kappa is not estimated: IVLIML raises, IV2SLS and IVJIVE set the kappa of LIML
+    # to NaN and mark the overidentification tests invalid, and a kappa that is given
+    # still fits. Dividing the residuals by their norms would magnify the rounding
     # error by 1e14, and kappa was -5.5e10 where it is 1.002657 (seed 0, Windows)
-    check_computed_as_before(IVLIML(*span_data(seed), kappa=1.0))
+    y, exog, endog, instr = span_data(seed)
+    mod = IVLIML(y, exog, endog, instr)
+    with pytest.raises(ValueError, match="Unable to estimate kappa"):
+        mod.fit()
+    with pytest.raises(LinAlgError, match="linear combination"):
+        mod._estimate_kappa()
+    res = IV2SLS(y, exog, endog, instr).fit()
+    assert np.isnan(res._liml_kappa)
+    assert isinstance(res.anderson_rubin, InvalidTestStatistic)
+    assert isinstance(res.basmann_f, InvalidTestStatistic)
+    res = IVJIVE(y, exog, endog, instr).fit()
+    assert np.isnan(res._liml_kappa)
+    assert isinstance(res.anderson_rubin, InvalidTestStatistic)
+    assert isinstance(res.basmann_f, InvalidTestStatistic)
+    res = IVLIML(y, exog, endog, instr, kappa=1.0).fit()
+    expected = k_class(y, exog, endog, instr, 1.0)
+    assert_allclose(res.params.to_numpy(), expected, rtol=1e-6, atol=1e-8)
 
 
 @pytest.mark.parametrize(
     "scales", SCALES_TWO_ENDOG, ids=[str(s) for s in SCALES_TWO_ENDOG]
 )
-def test_kappa_of_regressors_on_different_scales_is_computed_as_before(scales):
-    # The values are not the kappa of the data if the scales differ much (issue 823)
+def test_kappa_of_regressors_on_different_scales_is_the_generalized_eigenvalue(
+    scales,
+):
+    # The kappa of the data does not depend on the units of the variables (issue 823)
     design = (1, 2, 4, 120)
-    check_computed_as_before(IVLIML(*args(*scaled(design, scales)), kappa=1.0))
+    expected = reference_kappa(*data_for(design, seed=3))
+    y, exog, endog, instr = scaled(design, scales)
+    res = IVLIML(*args(y, exog, endog, instr)).fit()
+    assert_allclose(res.kappa, expected, rtol=1e-10)
 
 
 # ----------------------------------------------------------------------------
