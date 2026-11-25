@@ -209,9 +209,7 @@ def test_cluster_message_names_only_what_the_models_have(data):
     # an endogenous regressor that is spanned by them has no kappa (issue 823),
     # and fit raises before it reaches the covariance estimator
     endog = (
-        z.sum(axis=1)
-        + x["x0"]
-        + 0.01 * np.random.default_rng(3).standard_normal(NOBS)
+        z.sum(axis=1) + x["x0"] + 0.01 * np.random.default_rng(3).standard_normal(NOBS)
     ).to_frame("e")
     with pytest.warns(MissingValueWarning, match="missing values"):
         models = {
