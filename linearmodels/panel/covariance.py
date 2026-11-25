@@ -888,10 +888,13 @@ class FamaMacBethCovariance(HomoskedasticCovariance):
     Raises
     ------
     ValueError
-        If the bandwidth is not below the number of time periods that are used.
-        It is also raised if the bandwidth is not provided and there are fewer
-        time periods than the kernel needs to compute it, or if the bandwidth
-        that is computed is not finite.
+        If there are no residual degrees of freedom, which occurs when at most
+        one cross-sectional estimate is available and ``debiased`` is True, or
+        if no finite cross-sectional estimates are available. It is also raised
+        if the bandwidth is not below the number of time periods that are used,
+        if the bandwidth is not provided and there are fewer time periods than
+        the kernel needs to compute it, or if the bandwidth that is computed is
+        not finite.
     UnknownOptionError
         If ``kernel`` is not one of the supported names, whether or not the
         covariance is a kernel covariance. It is both a ``ValueError`` and a
@@ -961,10 +964,17 @@ class FamaMacBethCovariance(HomoskedasticCovariance):
         # Checked here, also if the bandwidth is selected from the data, so that fit
         # raises and not the first use of the covariance
         self._kernel_weights = lookup_option(KERNEL_LOOKUP, self._kernel, "kernel")
+        deviations = np.asarray(all_params) - params.T
+        nperiods = int(np.all(np.isfinite(deviations), 1).sum())
+        if nperiods - int(bool(debiased)) <= 0:
+            period_word = "period" if nperiods == 1 else "periods"
+            raise ValueError(
+                "The covariance of the model cannot be estimated since the model has "
+                f"no residual degrees of freedom. It uses {nperiods} cross-sectional "
+                f"time {period_word}."
+            )
         if bandwidth is not None:
             # Checked here so that fit raises, and not the first use of the covariance
-            deviations = np.asarray(all_params) - params.T
-            nperiods = int(np.all(np.isfinite(deviations), 1).sum())
             if bandwidth >= nperiods:
                 raise ValueError(
                     "The bandwidth of the Fama-MacBeth kernel covariance, "
