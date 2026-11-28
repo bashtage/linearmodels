@@ -20,6 +20,7 @@ import textwrap
 from typing import Any, Literal, Optional, TypedDict, cast
 import warnings
 
+from formulaic.model_spec import ModelSpec
 from formulaic.utils.context import capture_context
 import numpy as np
 from numpy.linalg import inv, lstsq, matrix_rank, solve
@@ -228,6 +229,11 @@ class SystemFormulaParser:
     context : dict of str to object, optional
         Namespace used to evaluate the formulas. The default is the namespace
         of the frame at depth ``eval_env``.
+    model_specs : dict of str to dict of str to ModelSpec, optional
+        The ``model_specs`` of a parser of the same formula. If provided, the
+        variables are built with the categories and the state of the
+        transformations, such as ``center``, of that parser's data, and not of
+        ``data``. Used to construct out-of-sample predictions.
     """
 
     def __init__(
@@ -237,6 +243,7 @@ class SystemFormulaParser:
         weights: Mapping[str, linearmodels.typing.data.ArrayLike] | None = None,
         eval_env: int = 2,
         context: Mapping[str, Any] | None = None,
+        model_specs: Mapping[str, Mapping[str, ModelSpec]] | None = None,
     ) -> None:
         if not isinstance(formula, (Mapping, str)):
             raise TypeError("formula must be a string or dictionary-like")
@@ -253,6 +260,7 @@ class SystemFormulaParser:
         self._weight_dict: dict[str, Series | None] = {}
         self._eval_env = eval_env
         self._clean_formula: dict[str, str] = {}
+        self._model_specs = model_specs or {}
         if context is None:
             self._context = capture_context(eval_env)
         else:
@@ -296,7 +304,12 @@ class SystemFormulaParser:
             for formula_key in formula:
                 f = formula[formula_key]
                 f = self._prevent_autoconst(f)
-                parsers[formula_key] = IVFormulaParser(f, data, context=self._context)
+                parsers[formula_key] = IVFormulaParser(
+                    f,
+                    data,
+                    context=self._context,
+                    model_specs=self._model_specs.get(formula_key),
+                )
 
                 if weights is not None:
                     if formula_key in weights:
@@ -328,7 +341,12 @@ class SystemFormulaParser:
                     key = base_key + f".{count}"
                     count += 1
                 assert isinstance(key, str)
-                parsers[key] = IVFormulaParser(f, data, context=self._context)
+                parsers[key] = IVFormulaParser(
+                    f,
+                    data,
+                    context=self._context,
+                    model_specs=self._model_specs.get(key),
+                )
                 cln_formula[key] = f
                 if weights is not None:
                     if key in weights:
@@ -362,9 +380,17 @@ class SystemFormulaParser:
         for key in parsers:
             parser = parsers[key]
             new_parsers[key] = IVFormulaParser(
-                parser._formula, parser._data, context=self._context
+                parser._formula,
+                parser._data,
+                context=self._context,
+                model_specs=self._model_specs.get(key),
             )
         self._parsers = new_parsers
+
+    @property
+    def model_specs(self) -> dict[str, dict[str, ModelSpec]]:
+        """Specifications of the variables that have been built, by equation."""
+        return {key: parser.model_specs for key, parser in self._parsers.items()}
 
     @property
     def equation_labels(self) -> list[str]:
@@ -486,6 +512,7 @@ class _SystemModelBase:
 
         self._weights: list[IVData] = []
         self._formula: str | dict[str, str] | None = None
+        self._model_specs: dict[str, dict[str, ModelSpec]] = {}
         self._constraints: LinearConstraint | None = None
         self._constant_loc: list[int] = []
         self._has_constant: Series = Series(dtype=bool)
@@ -505,6 +532,7 @@ class _SystemModelBase:
         self, value: str | dict[str, str] | None
     ) -> None:  # numpydoc ignore=GL08
         self._formula = value
+        self._model_specs = {}
 
     def _validate_data(self) -> None:
         ids = []
@@ -825,7 +853,10 @@ class _SystemModelBase:
         if data is not None:
             assert self.formula is not None
             parser = SystemFormulaParser(
-                self.formula, data=data, context=capture_context(eval_env)
+                self.formula,
+                data=data,
+                context=capture_context(eval_env),
+                model_specs=self._model_specs,
             )
             equations_d = parser.data
         else:
@@ -1916,6 +1947,7 @@ class IV3SLS(_LSSystemModelBase):
         eqns = parser.data
         mod = cls(eqns, sigma=sigma)
         mod.formula = formula
+        mod._model_specs = parser.model_specs
         return mod
 
 
@@ -2172,6 +2204,7 @@ class SUR(_LSSystemModelBase):
         eqns = parser.data
         mod = cls(eqns, sigma=sigma)
         mod.formula = formula
+        mod._model_specs = parser.model_specs
         return mod
 
 
@@ -2760,6 +2793,7 @@ class IVSystemGMM(_SystemModelBase):
         eqns = parser.data
         mod = cls(eqns, sigma=None, weight_type=weight_type, **weight_config)
         mod.formula = formula
+        mod._model_specs = parser.model_specs
         return mod
 
     def _j_statistic(

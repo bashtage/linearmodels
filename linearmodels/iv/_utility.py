@@ -7,9 +7,9 @@ from types import FrameType
 from typing import Any, Literal, NamedTuple, cast
 import warnings
 
-from formulaic import model_matrix
 from formulaic.formula import Formula
 from formulaic.materializers.types import NAAction as fNAAction
+from formulaic.model_spec import ModelSpec
 from formulaic.utils.context import capture_context
 import numpy as np
 from pandas import DataFrame
@@ -383,6 +383,11 @@ class IVFormulaParser:
         Variables to use when evaluating the formula, in addition to ``data``. If
         not provided, the variables of the stack frame that ``eval_env`` selects
         are used.
+    model_specs : mapping of str to ModelSpec, optional
+        The ``model_specs`` of a parser of the same formula. If provided, the
+        variables are built with the categories and the state of the
+        transformations, such as ``center``, of that parser's data, and not of
+        ``data``. Used to construct out-of-sample predictions.
 
     Raises
     ------
@@ -400,6 +405,7 @@ class IVFormulaParser:
         data: DataFrame,
         eval_env: int = 2,
         context: Mapping[str, Any] | None = None,
+        model_specs: Mapping[str, ModelSpec] | None = None,
     ):
         self._formula = formula
         self._data = data
@@ -408,6 +414,7 @@ class IVFormulaParser:
             self._context = capture_context(context=self._eval_env)
         else:
             self._context = context
+        self._model_specs: dict[str, ModelSpec] = dict(model_specs or {})
         self._components: dict[str, str] = {}
         self._parse()
 
@@ -473,54 +480,48 @@ class IVFormulaParser:
         self._eval_env -= 1
         return out
 
+    def _model_matrix(self, name: str, fmla: str, ensure_full_rank: bool) -> DataFrame:
+        spec = self._model_specs.get(name)
+        if spec is None:
+            mm = Formula(fmla).get_model_matrix(
+                self._data,
+                context=self._context,
+                ensure_full_rank=ensure_full_rank,
+                na_action=fNAAction("ignore"),
+            )
+        else:
+            mm = spec.get_model_matrix(self._data, context=self._context)
+        self._model_specs[name] = mm.model_spec
+        return DataFrame(mm)
+
+    @property
+    def model_specs(self) -> dict[str, ModelSpec]:
+        """Specifications of the variables that have been built, by name."""
+        return dict(self._model_specs)
+
     @property
     def dependent(self) -> DataFrame:
         """Dependent variable."""
         dep_fmla = self.components["dependent"]
-        dep = model_matrix(
-            dep_fmla,
-            self._data,
-            context=self._context,
-            ensure_full_rank=False,
-            na_action=fNAAction("ignore"),
-        )
-        return DataFrame(dep)
+        return self._model_matrix("dependent", dep_fmla, False)
 
     @property
     def exog(self) -> DataFrame | None:
         """Exogenous variables."""
         exog_fmla = self.components["exog"]
-        exog = Formula(exog_fmla).get_model_matrix(
-            self._data,
-            context=self._context,
-            ensure_full_rank=True,
-            na_action=fNAAction("ignore"),
-        )
-        return self._empty_check(DataFrame(exog))
+        return self._empty_check(self._model_matrix("exog", exog_fmla, True))
 
     @property
     def endog(self) -> DataFrame | None:
         """Endogenous variables."""
         endog_fmla = "0 +" + self.components["endog"]
-        endog = Formula(endog_fmla).get_model_matrix(
-            self._data,
-            context=self._context,
-            ensure_full_rank=False,
-            na_action=fNAAction("ignore"),
-        )
-        return self._empty_check(DataFrame(endog))
+        return self._empty_check(self._model_matrix("endog", endog_fmla, False))
 
     @property
     def instruments(self) -> DataFrame | None:
         """Instruments."""
         instr_fmla = "0 +" + self.components["instruments"]
-        instr = Formula(instr_fmla).get_model_matrix(
-            self._data,
-            context=self._context,
-            ensure_full_rank=False,
-            na_action=fNAAction("ignore"),
-        )
-        return self._empty_check(DataFrame(instr))
+        return self._empty_check(self._model_matrix("instruments", instr_fmla, False))
 
     @property
     def components(self) -> dict[str, str]:
