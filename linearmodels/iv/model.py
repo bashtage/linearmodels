@@ -8,6 +8,7 @@ from collections.abc import Callable, Mapping
 from typing import Any, Literal, TypeVar, Union, cast
 import warnings
 
+from formulaic.model_spec import ModelSpec
 from numpy import (
     all as npall,
     any as npany,
@@ -400,6 +401,7 @@ class _IVModelBase:
         if endog is None and instruments is None:
             self._method = "OLS"
         self._formula = ""
+        self._model_specs: dict[str, ModelSpec] = {}
 
     def predict(
         self,
@@ -477,7 +479,9 @@ class _IVModelBase:
         if endog is not None:
             endog = IVData(endog, var_name="endog").pandas
         if data is not None:
-            parser = IVFormulaParser(self.formula, data, eval_env=eval_env)
+            parser = IVFormulaParser(
+                self.formula, data, eval_env=eval_env, model_specs=self._model_specs
+            )
             exog = parser.exog
             endog = parser.endog
         if all(a is None for a in (exog, endog, data)):
@@ -526,6 +530,7 @@ class _IVModelBase:
             The formula.
         """
         self._formula = value
+        self._model_specs = {}
 
     def _validate_inputs(self) -> None:
         x = self._x
@@ -1390,6 +1395,7 @@ class IVLIML(_IVLSModelBase):
             kappa=kappa,
         )
         mod.formula = formula
+        mod._model_specs = parser.model_specs
         return mod
 
 
@@ -1579,6 +1585,7 @@ class IV2SLS(_IVLSModelBase):
         dep, exog, endog, instr = parser.data
         mod = IV2SLS(dep, exog, endog, instr, weights=weights)
         mod.formula = formula
+        mod._model_specs = parser.model_specs
         return mod
 
 
@@ -3115,6 +3122,7 @@ def _gmm_model_from_formula(
         **weight_config,
     )
     mod.formula = formula
+    mod._model_specs = parser.model_specs
     return mod
 
 
@@ -3456,6 +3464,7 @@ class IVJIVE(_IVModelBase):
         dep, exog, endog, instr = parser.data
         mod = IVJIVE(dep, exog, endog, instr, weights=weights)
         mod.formula = formula
+        mod._model_specs = parser.model_specs
         return mod
 
     def fit(

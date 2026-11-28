@@ -9,7 +9,7 @@ from typing import Any, NamedTuple, Union, cast
 import warnings
 
 from formulaic.formula import Formula
-from formulaic.model_spec import NAAction
+from formulaic.model_spec import ModelSpec, NAAction
 from formulaic.parser.algos.tokenize import tokenize
 from formulaic.utils.context import capture_context
 import numpy as np
@@ -308,6 +308,11 @@ class PanelFormulaParser:
     context : Mapping of str to object, optional
         The variables that the formula can use, by name. If not provided, it is
         captured at the stack depth `eval_env`.
+    model_specs : Mapping of str to ModelSpec, optional
+        The ``model_specs`` of a parser of the same formula. If provided, the
+        variables are built with the categories and the state of the
+        transformations, such as ``center``, of that parser's data, and not of
+        ``data``. Used to construct out-of-sample predictions.
 
     Notes
     -----
@@ -320,6 +325,7 @@ class PanelFormulaParser:
         data: PanelDataLike,
         eval_env: int = 2,
         context: Mapping[str, Any] | None = None,
+        model_specs: Mapping[str, ModelSpec] | None = None,
     ) -> None:
         self._formula = formula
         self._data = _panel_data(data, "data", "x", convert_dummies=False, copy=False)
@@ -329,6 +335,7 @@ class PanelFormulaParser:
             self._context = capture_context(eval_env)
         else:
             self._context = context
+        self._model_specs: dict[str, ModelSpec] = dict(model_specs or {})
         self._dependent = self._exog = None
         self._parse()
 
@@ -399,27 +406,33 @@ class PanelFormulaParser:
         out = self.dependent, self.exog
         return out
 
-    @property
-    def dependent(self) -> DataFrame:
-        """DataFrame containing the dependent variable."""
-        return DataFrame(
-            Formula(self._lhs).get_model_matrix(
+    def _model_matrix(self, name: str, fmla: str) -> DataFrame:
+        spec = self._model_specs.get(name)
+        if spec is None:
+            mm = Formula(fmla).get_model_matrix(
                 self._data.dataframe,
                 context=self._context,
                 na_action=self._na_action,
             )
-        )
+        else:
+            mm = spec.get_model_matrix(self._data.dataframe, context=self._context)
+        self._model_specs[name] = mm.model_spec
+        return DataFrame(mm)
+
+    @property
+    def model_specs(self) -> dict[str, ModelSpec]:
+        """Specifications of the variables that have been built, by name."""
+        return dict(self._model_specs)
+
+    @property
+    def dependent(self) -> DataFrame:
+        """DataFrame containing the dependent variable."""
+        return self._model_matrix("dependent", self._lhs)
 
     @property
     def exog(self) -> DataFrame:
         """DataFrame containing the exogenous variables."""
-        return DataFrame(
-            Formula(self._rhs).get_model_matrix(
-                self._data.dataframe,
-                context=self._context,
-                na_action=self._na_action,
-            )
-        )
+        return self._model_matrix("exog", self._rhs)
 
 
 class AmbiguityError(Exception):
@@ -634,6 +647,7 @@ class _PanelModelBase:
         self._original_index = self.dependent.index.copy()
         self._constant = False
         self._formula: str | None = None
+        self._model_specs: dict[str, ModelSpec] = {}
         self._is_weighted = True
         self._name = self.__class__.__name__
         self.weights = self._adapt_weights(weights)
@@ -1224,6 +1238,7 @@ class _PanelModelBase:
     @formula.setter
     def formula(self, value: str | None) -> None:  # numpydoc ignore=GL08
         self._formula = value
+        self._model_specs = {}
 
     @property
     def has_constant(self) -> bool:
@@ -1655,7 +1670,9 @@ class _PanelModelBase:
             assert data is not None
             if context is None:
                 context = capture_context(eval_env)
-            parser = PanelFormulaParser(self._formula, data, context=context)
+            parser = PanelFormulaParser(
+                self._formula, data, context=context, model_specs=self._model_specs
+            )
             exog = parser.exog
         x = exog.values
         params = np.atleast_2d(np.asarray(params))
@@ -1850,6 +1867,7 @@ class PooledOLS(_PanelModelBase):
         dependent, exog = parser.data
         mod = cls(dependent, exog, weights=weights, check_rank=check_rank)
         mod.formula = formula
+        mod._model_specs = parser.model_specs
         return mod
 
     def fit(
@@ -2166,7 +2184,9 @@ class PooledOLS(_PanelModelBase):
             assert data is not None
             if context is None:
                 context = capture_context(eval_env)
-            parser = PanelFormulaParser(self._formula, data, context=context)
+            parser = PanelFormulaParser(
+                self._formula, data, context=context, model_specs=self._model_specs
+            )
             exog = parser.exog
         x = exog.values
         params = np.atleast_2d(np.asarray(params))
@@ -2739,6 +2759,7 @@ class PanelOLS(_PanelModelBase):
             check_rank=check_rank,
         )
         mod.formula = formula
+        mod._model_specs = parser.model_specs
         return mod
 
     def _lsmr_path(
@@ -4024,6 +4045,7 @@ class BetweenOLS(_PanelModelBase):
         dependent, exog = parser.data
         mod = cls(dependent, exog, weights=weights, check_rank=check_rank)
         mod.formula = formula
+        mod._model_specs = parser.model_specs
         return mod
 
 
@@ -4578,6 +4600,7 @@ class FirstDifferenceOLS(_PanelModelBase):
         dependent, exog = parser.data
         mod = cls(dependent, exog, weights=weights, check_rank=check_rank)
         mod.formula = formula
+        mod._model_specs = parser.model_specs
         return mod
 
 
@@ -4761,6 +4784,7 @@ class RandomEffects(_PanelModelBase):
         dependent, exog = parser.data
         mod = cls(dependent, exog, weights=weights, check_rank=check_rank)
         mod.formula = formula
+        mod._model_specs = parser.model_specs
         return mod
 
     def fit(
@@ -5711,4 +5735,5 @@ class FamaMacBeth(_PanelModelBase):
         dependent, exog = parser.data
         mod = cls(dependent, exog, weights=weights, check_rank=check_rank)
         mod.formula = formula
+        mod._model_specs = parser.model_specs
         return mod
